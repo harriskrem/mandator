@@ -2,7 +2,7 @@
 import { CopyIcon, CopySuccessIcon, ScanQrIcon } from "@/assets/icons";
 import ModalScanQr from "@/components/modal/ScanQr.vue";
 import { useDataStore } from "@/store/dataStore";
-import { computed, ref, toRefs } from "vue";
+import { computed, ref, toRefs, onMounted, watch } from "vue";
 
 const props = defineProps<{
   clientId: string;
@@ -32,10 +32,11 @@ const copyToClipboard = () => {
 };
 
 const getShareCodeForReceive = () => {
-  if (checkedURL.value) {
-    return `https://tobefilled.tech/${clientId.value}`;
-  }
-  return clientId.value;
+  const shareCode = checkedURL.value
+    ? `https://tobefilled.tech/${clientId.value}`
+    : clientId.value;
+  console.log("📋 ReceiveTab: getShareCodeForReceive returning:", shareCode);
+  return shareCode;
 };
 </script>
 
@@ -47,7 +48,18 @@ const getShareCodeForReceive = () => {
   <div>
     <p class="leading-loose text-md">Receive files</p>
   </div>
-  <div class="my-2">
+  <div
+    v-if="!clientId"
+    class="my-2"
+  >
+    <div class="alert alert-info">
+      <span>🔄 Connecting to server...</span>
+    </div>
+  </div>
+  <div
+    v-else
+    class="my-2"
+  >
     <div class="label pb-0">
       <span
         v-if="checkedURL"

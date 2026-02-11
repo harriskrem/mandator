@@ -1,55 +1,31 @@
 <script setup lang="ts">
-import { receiveChunk, sendChunks, sendOffer } from "@/services/webrtc";
-import sendCandidate from "@/services/webrtc/sendCandidate";
 import { useDataStore } from "@/store/dataStore";
 import { usePeerStore } from "@/store/peerStore";
-import { useSocketStore } from "@/store/socketStore";
 import saveFile from "@/utils/saveFile";
 import { computed, ref, watchEffect } from "vue";
-import ReceiveTab from "./tabs/ReceiveTab.vue";
-import SendTab from "./tabs/SendTab.vue";
+import ReceivePanel from "./components/ReceivePanel.vue";
+import SendPanel from "./components/SendPanel.vue";
 import { v4 as uuidv4 } from "uuid";
+import { useWebRTC } from "@/composables/useWebRTC";
+
 /**
  * TODO:
  * Add feedback connected or disconnected from user
  **/
 const peerStore = usePeerStore();
 const dataStore = useDataStore();
-const socketStore = useSocketStore();
-// WebRTC & socket.io intializations
-let pc = computed(() => peerStore.pc);
-const dataChannel = pc.value.createDataChannel("dataTransfer", {
-  ordered: true,
-  maxRetransmits: 10,
-});
-dataChannel.binaryType = "arraybuffer";
 
+// Initialize WebRTC composable
+const { handleSend } = useWebRTC();
+
+// Reactive references
 const clientId = computed(() => peerStore.clientId);
 const remoteId = computed(() => peerStore.remoteId);
-const socket = computed(() => socketStore.getSocket);
-// Receive tab
 const filesToSend = computed(() => dataStore.filesToSend);
-// Send Tab
+
+// Send Tab state
 const isSendButtonDisabled = ref<boolean>(true);
 const pressedSendButton = ref<boolean>(false);
-// For debugging
-pc.value.addEventListener("iceconnectionstatechange", () => {
-  console.log("state: ", pc.value.iceConnectionState);
-  if (
-    pc.value.iceConnectionState === "connected" ||
-    pc.value.iceConnectionState === "completed"
-  ) {
-    console.log("ICE negotiation successful!");
-  }
-});
-// Find candidates
-pc.value.addEventListener("icecandidate", (ev) =>
-  sendCandidate(ev.candidate, remoteId.value, pc.value, socket.value)
-);
-// Receive chunks
-pc.value.addEventListener("datachannel", (ev) => receiveChunk(ev, dataChannel));
-// Send chunks when channel is connected
-dataChannel.onopen = () => sendChunks(filesToSend.value, pc.value, dataChannel);
 
 const onCameraDetect = (detectedCode: any[]) => {
   peerStore.setRemoteId(detectedCode[0].rawValue);
@@ -64,16 +40,11 @@ const onFileSelection = (event: Event) => {
     }
   }
 };
+
 // When pressing send file button
 const handleSendButton = () => {
   pressedSendButton.value = true;
-  if (pc.value.iceConnectionState === "new") {
-    sendOffer(pc.value, socket.value, remoteId);
-  } else if (pc.value.iceConnectionState === "connected") {
-    if (dataChannel.readyState === "open") {
-      sendChunks(filesToSend.value, pc.value, dataChannel);
-    }
-  }
+  handleSend();
 };
 
 watchEffect(() => {
@@ -113,7 +84,7 @@ watchEffect(() => {
             role="tabpanel"
             class="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
           >
-            <send-tab
+            <send-panel
               :is-send-button-disabled="isSendButtonDisabled"
               @qr-detect="onCameraDetect"
               @handle-file-selection="onFileSelection"
@@ -132,9 +103,8 @@ watchEffect(() => {
             role="tabpanel"
             class="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
           >
-            <receive-tab
-              v-if="clientId"
-              :client-id="clientId"
+            <receive-panel
+              :client-id="clientId || ''"
               @save-file="saveFile"
             />
           </div>
