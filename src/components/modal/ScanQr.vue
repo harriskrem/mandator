@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import QrCode from "../QrCode.vue";
-import { CloseIcon } from "@/assets/icons";
+import TerminalTitleBar from "@/components/fides/TerminalTitleBar.vue";
 
 const { selfCode, scanQr } = defineProps<{
   scanQr?: boolean;
   selfCode?: string;
-  cameraDetect?: (a: any[]) => void;
 }>();
 
 const showModal = defineModel("showModal", {
@@ -22,51 +21,62 @@ const handleClose = () => (showModal.value = false);
 
 <template>
   <div v-if="showModal">
-    <dialog
-      id="my_modal_2"
-      class="modal"
-      :class="{ 'modal-open': showModal }"
-    >
-      <div class="modal-box sm:w-4/12">
-        <p
-          v-if="scanQr"
-          class="text-center text-2xl"
-        >
-          Scan with your camera
-        </p>
-        <p
-          v-else
-          class="text-center text-2xl"
-        >
-          Share your code
-        </p>
-        <div class="flex justify-center my-4">
-          <QrCode
-            v-if="selfCode"
-            :qr-value="selfCode"
-            :size="350"
-          />
-          <qrcode-stream
-            v-else
-            @detect="$emit('cameraDetect', $event)"
+    <div class="fixed inset-0 z-40 flex items-center justify-center p-4">
+      <!-- Backdrop -->
+      <div
+        class="absolute inset-0 bg-background/85 backdrop-blur-sm"
+        @click="handleClose"
+        aria-hidden="true"
+      />
+
+      <!-- Modal card -->
+      <div class="relative w-full max-w-sm border border-neon-cyan/20 bg-card p-6 glow-cyan text-center">
+        <!-- Terminal title bar -->
+        <div class="absolute top-0 left-0 right-0">
+          <terminal-title-bar
+            :title="scanQr ? '~/fides/qr-scan' : '~/fides/qr-share'"
           />
         </div>
-        <div class="flex justify-center">
+
+        <div class="mt-6">
+          <h2 class="text-xs text-neon-cyan text-glow-cyan uppercase tracking-wider mb-6">
+            {{ scanQr ? "> scan with camera" : "> share your code" }}
+          </h2>
+
+          <div class="flex justify-center my-4">
+            <QrCode
+              v-if="selfCode"
+              :qr-value="selfCode"
+            />
+            <qrcode-stream
+              v-else
+              @detect="$emit('cameraDetect', $event)"
+            />
+          </div>
+
           <button
-            class="btn btn-accent btn-md"
+            type="button"
+            class="mt-6 w-full h-9 border border-border bg-secondary/30 text-xs text-muted-foreground uppercase tracking-wider hover:text-foreground hover:border-neon-cyan/30 transition-all duration-300 flex items-center justify-center gap-2"
             @click="handleClose"
           >
-            <CloseIcon />
+            <!-- X icon -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-3.5 h-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+            close
           </button>
         </div>
       </div>
-      <form
-        method="dialog"
-        class="modal-backdrop"
-        @submit="handleClose"
-      >
-        <button type="submit">close</button>
-      </form>
-    </dialog>
+    </div>
   </div>
 </template>

@@ -1,6 +1,7 @@
-// Hide keys in the future
+const turnUsername = import.meta.env.VITE_TURN_USERNAME;
+const turnCredential = import.meta.env.VITE_TURN_CREDENTIAL;
 
-const configuration = {
+const configuration: RTCConfiguration = {
   iceServers: [
     {
       urls: [
@@ -8,17 +9,20 @@ const configuration = {
         "stun:stun.relay.metered.ca:443",
       ],
     },
-    {
-      urls: [
-        "turn:eu.relay.metered.ca:80",
-        "turn:eu.relay.metered.ca:443",
-        "turn:eu.relay.metered.ca:443?transport=tcp",
-      ],
-      username: "146f499dbe6ba26f594821fa",
-      credential: "HFkkVaeSA3kpVmoO",
-    },
+    ...(turnUsername && turnCredential
+      ? [
+          {
+            urls: [
+              "turn:eu.relay.metered.ca:80",
+              "turn:eu.relay.metered.ca:443",
+              "turn:eu.relay.metered.ca:443?transport=tcp",
+            ],
+            username: turnUsername,
+            credential: turnCredential,
+          },
+        ]
+      : []),
   ],
 };
 
-export default configuration
-
+export default configuration;

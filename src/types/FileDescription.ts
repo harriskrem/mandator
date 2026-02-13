@@ -1,5 +1,6 @@
 export type FileDescription = {
   id: string;
   filename: string;
-  size: number
+  size: number;
+  hash?: string;
 }
