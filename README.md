@@ -1,4 +1,4 @@
-# fides
+# mandator
 
 A privacy-centric file transfer web application using the WebRTC protocol (**WIP**). 
 

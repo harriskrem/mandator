@@ -11,7 +11,7 @@ defineProps<{
       <div class="w-2 h-2 rounded-full bg-neon-amber/50" />
       <div class="w-2 h-2 rounded-full bg-neon-green/50" />
     </div>
-    <span class="text-[10px] text-muted-foreground/60 uppercase tracking-wider">
+    <span class="text-[0.625rem] text-muted-foreground/60 uppercase tracking-wider">
       {{ title }}
     </span>
   </div>

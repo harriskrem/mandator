@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import ConnectionBadge from "@/components/fides/ConnectionBadge.vue";
-import DropZone from "@/components/fides/DropZone.vue";
-import PixelProgressBar from "@/components/fides/PixelProgressBar.vue";
+import ConnectionBadge from "@/components/mandator/ConnectionBadge.vue";
+import DropZone from "@/components/mandator/DropZone.vue";
+import PixelProgressBar from "@/components/mandator/PixelProgressBar.vue";
 import ModalScanQr from "@/components/modal/ScanQr.vue";
 import { useDataStore } from "@/store/dataStore";
 import { usePeerStore } from "@/store/peerStore";
@@ -74,7 +74,7 @@ const formatSize = (bytes: number) => {
       class="border border-destructive/30 bg-destructive/5 p-3 glow-red"
     >
       <div class="flex items-start gap-2">
-        <span class="text-[10px] text-destructive shrink-0 mt-0.5 uppercase tracking-wider">
+        <span class="text-[0.625rem] text-destructive shrink-0 mt-0.5 uppercase tracking-wider">
           [err]
         </span>
         <p class="text-xs text-destructive/80">
@@ -89,7 +89,7 @@ const formatSize = (bytes: number) => {
       class="border border-destructive/30 bg-destructive/5 p-3 glow-red"
     >
       <div class="flex items-start gap-2">
-        <span class="text-[10px] text-destructive shrink-0 mt-0.5 uppercase tracking-wider">
+        <span class="text-[0.625rem] text-destructive shrink-0 mt-0.5 uppercase tracking-wider">
           [err]
         </span>
         <p class="text-xs text-destructive/80">
@@ -100,7 +100,7 @@ const formatSize = (bytes: number) => {
 
     <!-- Peer code input -->
     <div>
-      <label class="block text-[10px] text-muted-foreground mb-2 uppercase tracking-wider">
+      <label class="block text-[0.625rem] text-muted-foreground mb-2 uppercase tracking-wider">
         $ remote_peer --code
       </label>
       <div class="flex gap-2">
@@ -154,8 +154,8 @@ const formatSize = (bytes: number) => {
       class="border border-border bg-card/30 overflow-hidden"
     >
       <div class="px-3 py-2 border-b border-border bg-secondary/30 flex items-center gap-2">
-        <span class="text-[10px] text-muted-foreground/60">&gt;</span>
-        <h3 class="text-[10px] text-muted-foreground uppercase tracking-wider">
+        <span class="text-[0.625rem] text-muted-foreground/60">&gt;</span>
+        <h3 class="text-[0.625rem] text-muted-foreground uppercase tracking-wider">
           queued_files ({{ fileSendEntries.length }})
         </h3>
       </div>
@@ -169,7 +169,7 @@ const formatSize = (bytes: number) => {
             <p class="text-xs text-foreground truncate">
               {{ sendingFile.file.name }}
             </p>
-            <p class="text-[10px] text-muted-foreground/60 mt-0.5">
+            <p class="text-[0.625rem] text-muted-foreground/60 mt-0.5">
               {{ formatSize(sendingFile.file.size) }}
             </p>
           </div>

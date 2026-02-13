@@ -54,8 +54,8 @@ const onFileChange = (event: Event) => {
         <div class="w-2 h-2 rounded-full bg-neon-amber/50" />
         <div class="w-2 h-2 rounded-full bg-neon-green/50" />
       </div>
-      <span class="text-[10px] text-muted-foreground/60 uppercase tracking-wider">
-        ~/fides/drop-zone
+      <span class="text-[0.625rem] text-muted-foreground/60 uppercase tracking-wider">
+        ~/mandator/drop-zone
       </span>
     </div>
 
@@ -122,7 +122,7 @@ const onFileChange = (event: Event) => {
         class="hidden"
         @change="onFileChange"
       />
-      <p class="text-[10px] text-muted-foreground/50 uppercase tracking-wider">
+      <p class="text-[0.625rem] text-muted-foreground/50 uppercase tracking-wider">
         // supports any file type
       </p>
     </div>

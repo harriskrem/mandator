@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import QrCode from "../QrCode.vue";
-import TerminalTitleBar from "@/components/fides/TerminalTitleBar.vue";
+import TerminalTitleBar from "@/components/mandator/TerminalTitleBar.vue";
 
 const { selfCode, scanQr } = defineProps<{
   scanQr?: boolean;
@@ -34,7 +34,7 @@ const handleClose = () => (showModal.value = false);
         <!-- Terminal title bar -->
         <div class="absolute top-0 left-0 right-0">
           <terminal-title-bar
-            :title="scanQr ? '~/fides/qr-scan' : '~/fides/qr-share'"
+            :title="scanQr ? '~/mandator/qr-scan' : '~/mandator/qr-share'"
           />
         </div>
 

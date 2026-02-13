@@ -49,7 +49,7 @@ const config = computed(() => statusConfig[props.status]);
       :class="config.dotClass"
     />
     <span
-      class="text-[10px] uppercase tracking-wider"
+      class="text-[0.625rem] uppercase tracking-wider"
       :class="config.textClass"
     >
       {{ config.label }}

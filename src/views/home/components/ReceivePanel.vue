@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PixelProgressBar from "@/components/fides/PixelProgressBar.vue";
+import PixelProgressBar from "@/components/mandator/PixelProgressBar.vue";
 import ModalScanQr from "@/components/modal/ScanQr.vue";
 import { useDataStore } from "@/store/dataStore";
 import { computed, ref, toRefs } from "vue";
@@ -86,7 +86,7 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
   <div class="flex flex-col gap-5">
     <!-- Toggle label + switch -->
     <div class="flex items-center justify-between">
-      <label class="text-[10px] text-muted-foreground uppercase tracking-wider">
+      <label class="text-[0.625rem] text-muted-foreground uppercase tracking-wider">
         {{ showUrl ? "$ echo $SHARE_URL" : "$ echo $SHARE_CODE" }}
       </label>
       <button
@@ -101,7 +101,7 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
           class="absolute top-0.5 h-3 w-3 transition-all duration-300"
           :class="
             showUrl
-              ? 'left-[18px] bg-neon-magenta shadow-[0_0_6px_hsl(320_80%_60%/0.5)]'
+              ? 'left-[1.125rem] bg-neon-magenta shadow-[0_0_0.375rem_hsl(320_80%_60%/0.5)]'
               : 'left-0.5 bg-muted-foreground'
           "
         />
@@ -259,8 +259,8 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
       class="border border-border bg-card/30 overflow-hidden"
     >
       <div class="px-3 py-2 border-b border-border bg-secondary/30 flex items-center gap-2">
-        <span class="text-[10px] text-muted-foreground/60">&gt;</span>
-        <h3 class="text-[10px] text-muted-foreground uppercase tracking-wider">
+        <span class="text-[0.625rem] text-muted-foreground/60">&gt;</span>
+        <h3 class="text-[0.625rem] text-muted-foreground uppercase tracking-wider">
           incoming_files ({{ incomingEntries.length }})
         </h3>
       </div>
@@ -274,7 +274,7 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
             <p class="text-xs text-foreground truncate">
               {{ receivingFile.filename }}
             </p>
-            <p class="text-[10px] text-muted-foreground/60 mt-0.5">
+            <p class="text-[0.625rem] text-muted-foreground/60 mt-0.5">
               {{ formatSize(receivingFile.size) }}
             </p>
           </div>
@@ -287,7 +287,7 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
             </template>
             <template v-else>
               <span
-                class="inline-flex items-center px-2 py-0.5 border text-[9px] uppercase tracking-wider"
+                class="inline-flex items-center px-2 py-0.5 border text-[0.5625rem] uppercase tracking-wider"
                 :class="integrityConfig[getIntegrityStatus(receivingFile)].className"
               >
                 {{ integrityConfig[getIntegrityStatus(receivingFile)].label }}

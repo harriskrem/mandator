@@ -23,14 +23,14 @@
           y2="19"
         />
       </svg>
-      <span>~/fides $</span>
+      <span>~/mandator $</span>
       <span class="text-neon-cyan">./init</span>
       <span class="blink-cursor" />
     </div>
 
     <!-- App title -->
     <h1 class="text-6xl sm:text-7xl lg:text-8xl font-bold tracking-tighter text-neon-cyan text-glow-cyan uppercase">
-      fides
+      mandator
     </h1>
 
     <!-- Tagline -->
@@ -113,14 +113,14 @@
             </svg>
           </div>
           <!-- ASCII data streams -->
-          <div class="absolute -top-8 left-1/2 -translate-x-1/2 flex flex-col items-center text-[10px] text-neon-cyan/40 leading-tight select-none">
+          <div class="absolute -top-8 left-1/2 -translate-x-1/2 flex flex-col items-center text-[0.625rem] text-neon-cyan/40 leading-tight select-none">
             <span class="animate-neon-pulse">0x7F</span>
             <span
               class="animate-neon-pulse"
               style="animation-delay: 0.3s"
             >|</span>
           </div>
-          <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center text-[10px] text-neon-magenta/40 leading-tight select-none">
+          <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center text-[0.625rem] text-neon-magenta/40 leading-tight select-none">
             <span
               class="animate-neon-pulse"
               style="animation-delay: 0.5s"
@@ -132,12 +132,12 @@
           </div>
           <!-- Side indicators -->
           <div
-            class="absolute top-1/2 -left-6 -translate-y-1/2 text-[10px] text-neon-amber/40 animate-neon-pulse"
+            class="absolute top-1/2 -left-6 -translate-y-1/2 text-[0.625rem] text-neon-amber/40 animate-neon-pulse"
           >
             &lt;&lt;
           </div>
           <div
-            class="absolute top-1/2 -right-6 -translate-y-1/2 text-[10px] text-neon-amber/40 animate-neon-pulse"
+            class="absolute top-1/2 -right-6 -translate-y-1/2 text-[0.625rem] text-neon-amber/40 animate-neon-pulse"
             style="animation-delay: 1s"
           >
             &gt;&gt;
@@ -149,7 +149,7 @@
     <!-- Bottom decorative line -->
     <div class="hidden lg:block mt-auto pt-8 w-full">
       <div class="h-px bg-gradient-to-r from-neon-cyan/30 via-neon-magenta/20 to-transparent" />
-      <p class="mt-3 text-[10px] text-muted-foreground/60 uppercase tracking-widest">
+      <p class="mt-3 text-[0.625rem] text-muted-foreground/60 uppercase tracking-widest">
         // v0.1.0 | pid:4821 | uptime:03:42:17
       </p>
     </div>
