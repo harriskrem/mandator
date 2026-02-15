@@ -260,22 +260,22 @@ onMounted(() => {
   opacity: 1;
   transform: none;
   z-index: 2;
-  animation: tab-glitch-in 180ms steps(4, jump-none) both;
+  animation: tab-glitch-in 350ms steps(4, jump-none) both;
 }
 
 .cyber-tab-panel--active::before {
-  animation: tab-scanlines 200ms linear both;
+  animation: tab-scanlines 400ms linear both;
 }
 
 .cyber-tab-panel--active::after {
-  animation: tab-glitch-line 150ms steps(3) both;
+  animation: tab-glitch-line 300ms steps(3) both;
 }
 
 .cyber-tab-panel--inactive {
   opacity: 0;
   transform: translate3d(0, 0, 0);
   z-index: 1;
-  transition: opacity 0ms 80ms;
+  transition: opacity 0ms 150ms;
 }
 
 .cyber-tab-panel--cyan {
