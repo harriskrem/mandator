@@ -1,4 +1,4 @@
 export type SendFile = {
-  file: File;
-  progress: number;
+  file: File
+  progress: number
 }

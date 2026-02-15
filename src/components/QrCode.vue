@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import QrcodeVue from "qrcode.vue";
-import { type Level, type RenderAs } from "qrcode.vue";
+import type { Level, RenderAs } from 'qrcode.vue'
+import { ref } from 'vue'
 
 const { qrValue } = defineProps<{
-  qrValue: string;
-}>();
-const level = ref<Level>("M");
-const renderAs = ref<RenderAs>("svg");
+  qrValue: string
+}>()
+const level = ref<Level>('M')
+const renderAs = ref<RenderAs>('svg')
 </script>
 
 <template>

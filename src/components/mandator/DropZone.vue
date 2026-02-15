@@ -1,38 +1,38 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue'
 
 const emit = defineEmits<{
-  (e: "filesDropped", files: File[]): void;
-  (e: "fileSelected", event: Event): void;
-}>();
+  (e: 'filesDropped', files: File[]): void
+  (e: 'fileSelected', event: Event): void
+}>()
 
-const isDragging = ref(false);
-const fileInput = ref<HTMLInputElement | null>(null);
+const isDragging = ref(false)
+const fileInput = ref<HTMLInputElement | null>(null)
 
 const onDragOver = (event: DragEvent) => {
-  event.preventDefault();
-  isDragging.value = true;
-};
+  event.preventDefault()
+  isDragging.value = true
+}
 
 const onDragLeave = () => {
-  isDragging.value = false;
-};
+  isDragging.value = false
+}
 
 const onDrop = (event: DragEvent) => {
-  event.preventDefault();
-  isDragging.value = false;
+  event.preventDefault()
+  isDragging.value = false
   if (event.dataTransfer?.files.length) {
-    emit("filesDropped", Array.from(event.dataTransfer.files));
+    emit('filesDropped', Array.from(event.dataTransfer.files))
   }
-};
+}
 
 const browseFiles = () => {
-  fileInput.value?.click();
-};
+  fileInput.value?.click()
+}
 
 const onFileChange = (event: Event) => {
-  emit("fileSelected", event);
-};
+  emit('fileSelected', event)
+}
 </script>
 
 <template>
@@ -95,9 +95,8 @@ const onFileChange = (event: Event) => {
           &gt; drop files here, or
         </p>
       </div>
-      <button
-        type="button"
-        class="inline-flex items-center gap-2 px-4 py-2 border border-neon-cyan/30 bg-secondary/30 text-neon-cyan text-xs uppercase tracking-wider hover:bg-neon-cyan/10 hover:border-neon-cyan/50 transition-all duration-300"
+      <Button
+        variant="secondary"
         @click="browseFiles"
       >
         <!-- FolderOpen icon -->
@@ -114,7 +113,7 @@ const onFileChange = (event: Event) => {
           <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" />
         </svg>
         <span>browse files</span>
-      </button>
+      </Button>
       <input
         ref="fileInput"
         type="file"

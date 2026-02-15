@@ -1,5 +1,3 @@
-import setupSocketListeners from "./signalListeners";
+import setupSocketListeners from './signalListeners'
 
-export {
-  setupSocketListeners
-}
+export { setupSocketListeners }

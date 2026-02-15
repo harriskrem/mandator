@@ -1,5 +1,5 @@
-import { PEER_ID_LENGTH, PEER_ID_PATTERN } from "@/config/constants";
-import type { Socket } from "socket.io-client";
+import type { Socket } from 'socket.io-client'
+import { PEER_ID_LENGTH, PEER_ID_PATTERN } from '@/config/constants'
 
 export default function sendCandidate(
   candidate: RTCIceCandidate | null,
@@ -12,9 +12,9 @@ export default function sendCandidate(
     PEER_ID_PATTERN.test(remoteId) &&
     pc
   ) {
-    socket.emit("send_candidate", {
+    socket.emit('send_candidate', {
       candidate: candidate,
       peerId: remoteId,
-    });
+    })
   }
 }

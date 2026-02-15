@@ -1,43 +1,45 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    progress: number;
-    complete?: boolean;
-    color?: "cyan" | "magenta" | "amber" | "green";
+    progress: number
+    complete?: boolean
+    color?: 'cyan' | 'magenta' | 'amber' | 'green'
   }>(),
   {
     complete: false,
-    color: "cyan",
+    color: 'cyan',
   },
-);
+)
 
 const colorMap = {
   cyan: {
-    filled: "bg-neon-cyan",
-    glow: "shadow-[0_0_0.25rem_hsl(187_100%_55%/0.4)]",
+    filled: 'bg-neon-cyan',
+    glow: 'shadow-[0_0_0.25rem_hsl(187_100%_55%/0.4)]',
   },
   magenta: {
-    filled: "bg-neon-magenta",
-    glow: "shadow-[0_0_0.25rem_hsl(320_80%_60%/0.4)]",
+    filled: 'bg-neon-magenta',
+    glow: 'shadow-[0_0_0.25rem_hsl(320_80%_60%/0.4)]',
   },
   amber: {
-    filled: "bg-neon-amber",
-    glow: "shadow-[0_0_0.25rem_hsl(40_95%_55%/0.4)]",
+    filled: 'bg-neon-amber',
+    glow: 'shadow-[0_0_0.25rem_hsl(40_95%_55%/0.4)]',
   },
   green: {
-    filled: "bg-neon-green",
-    glow: "shadow-[0_0_0.25rem_hsl(150_80%_50%/0.4)]",
+    filled: 'bg-neon-green',
+    glow: 'shadow-[0_0_0.25rem_hsl(150_80%_50%/0.4)]',
   },
-};
+}
 
-const totalSegments = 10;
+const totalSegments = 10
 const filledSegments = computed(() =>
   Math.round((props.progress / 100) * totalSegments),
-);
-const colors = computed(() => colorMap[props.color]);
-const segments = computed(() => Array.from({ length: totalSegments }, (_, i) => i));
+)
+const colors = computed(() => colorMap[props.color])
+const segments = computed(() =>
+  Array.from({ length: totalSegments }, (_, i) => i),
+)
 </script>
 
 <template>

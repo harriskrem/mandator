@@ -1,4 +1,4 @@
 export type FileProgress = {
-  id: string;
-  progress: number;
+  id: string
+  progress: number
 }

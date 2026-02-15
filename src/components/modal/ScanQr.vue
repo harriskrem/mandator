@@ -1,22 +1,17 @@
 <script setup lang="ts">
-import QrCode from "../QrCode.vue";
-import TerminalTitleBar from "@/components/mandator/TerminalTitleBar.vue";
-
 const { selfCode, scanQr } = defineProps<{
-  scanQr?: boolean;
-  selfCode?: string;
-}>();
+  scanQr?: boolean
+  selfCode?: string
+}>()
 
-const showModal = defineModel("showModal", {
+const showModal = defineModel('showModal', {
   type: Boolean,
   required: true,
-});
+})
 
-defineEmits<{
-  (e: "cameraDetect", a: any): void;
-}>();
+defineEmits<(e: 'cameraDetect', a: { rawValue: string }[]) => void>()
 
-const handleClose = () => (showModal.value = false);
+const handleClose = () => (showModal.value = false)
 </script>
 
 <template>
@@ -54,9 +49,10 @@ const handleClose = () => (showModal.value = false);
             />
           </div>
 
-          <button
-            type="button"
-            class="mt-6 w-full h-9 border border-border bg-secondary/30 text-xs text-muted-foreground uppercase tracking-wider hover:text-foreground hover:border-neon-cyan/30 transition-all duration-300 flex items-center justify-center gap-2"
+          <Button
+            variant="ghost"
+            full-width
+            class="mt-6"
             @click="handleClose"
           >
             <!-- X icon -->
@@ -74,7 +70,7 @@ const handleClose = () => (showModal.value = false);
               <path d="m6 6 12 12" />
             </svg>
             close
-          </button>
+          </Button>
         </div>
       </div>
     </div>

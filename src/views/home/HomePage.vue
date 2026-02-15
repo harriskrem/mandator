@@ -1,63 +1,62 @@
 <script setup lang="ts">
-import { useDataStore } from "@/store/dataStore";
-import { usePeerStore } from "@/store/peerStore";
-import saveFile from "@/utils/saveFile";
-import { computed, ref, watchEffect } from "vue";
-import ReceivePanel from "./components/ReceivePanel.vue";
-import SendPanel from "./components/SendPanel.vue";
-import HeroSection from "@/components/mandator/HeroSection.vue";
-import TerminalTitleBar from "@/components/mandator/TerminalTitleBar.vue";
-import { v4 as uuidv4 } from "uuid";
-import { useWebRTC } from "@/composables/useWebRTC";
+import { v4 as uuidv4 } from 'uuid'
+import { computed, ref, watchEffect } from 'vue'
+import { useWebRTC } from '@/composables/useWebRTC'
+import { useDataStore } from '@/store/dataStore'
+import { usePeerStore } from '@/store/peerStore'
+import saveFile from '@/utils/saveFile'
 
-const peerStore = usePeerStore();
-const dataStore = useDataStore();
+const peerStore = usePeerStore()
+const dataStore = useDataStore()
 
-const { handleSend } = useWebRTC();
+const { handleSend } = useWebRTC()
 
-const clientId = computed(() => peerStore.clientId);
-const remoteId = computed(() => peerStore.remoteId);
+const clientId = computed(() => peerStore.clientId)
+const remoteId = computed(() => peerStore.remoteId)
 
-const activeTab = ref<"send" | "receive">("send");
-const tabSwitchDirection = ref<1 | -1>(1);
-const isSendButtonDisabled = ref<boolean>(true);
+const activeTab = ref<'send' | 'receive'>('send')
+const tabSwitchDirection = ref<1 | -1>(1)
+const isSendButtonDisabled = ref<boolean>(true)
 
-const setActiveTab = (tab: "send" | "receive") => {
-  if (tab === activeTab.value) return;
-  tabSwitchDirection.value = tab === "receive" ? 1 : -1;
-  activeTab.value = tab;
-};
+const setActiveTab = (tab: 'send' | 'receive') => {
+  if (tab === activeTab.value) return
+  tabSwitchDirection.value = tab === 'receive' ? 1 : -1
+  activeTab.value = tab
+}
 
-const onCameraDetect = (detectedCode: any[]) => {
-  peerStore.setRemoteId(detectedCode[0].rawValue);
-};
+const onCameraDetect = (detectedCode: { rawValue: string }[]) => {
+  const first = detectedCode[0]
+  if (first) {
+    peerStore.setRemoteId(first.rawValue)
+  }
+}
 
 const onFileSelection = (event: Event) => {
-  const input = event.target as HTMLInputElement;
+  const input = event.target as HTMLInputElement
   if (input.files?.length) {
-    for (const file of input.files) {
-      const fileId = uuidv4();
-      dataStore.setFileToSend(fileId, file);
+    for (const file of Array.from(input.files)) {
+      const fileId = uuidv4()
+      dataStore.setFileToSend(fileId, file)
     }
   }
-};
+}
 
 const onFilesDropped = (files: File[]) => {
   for (const file of files) {
-    const fileId = uuidv4();
-    dataStore.setFileToSend(fileId, file);
+    const fileId = uuidv4()
+    dataStore.setFileToSend(fileId, file)
   }
-};
+}
 
 const handleSendButton = () => {
-  handleSend();
-};
+  handleSend()
+}
 
 watchEffect(() => {
   if (remoteId.value) {
-    isSendButtonDisabled.value = false;
+    isSendButtonDisabled.value = false
   }
-});
+})
 </script>
 
 <template>

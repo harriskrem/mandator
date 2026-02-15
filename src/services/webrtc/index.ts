@@ -1,6 +1,6 @@
 export { default as handleConnectionOffer } from './handleConnectionOffer'
 export { default as handleReceivedCandidate } from './handleReceivedCandidate'
 export { default as processAnswer } from './processAnswer'
-export { default as sendOffer } from './sendOffer'
-export { default as sendChunks } from './sendChunks'
 export { default as receiveChunk } from './receiveChunk'
+export { default as sendChunks } from './sendChunks'
+export { default as sendOffer } from './sendOffer'

@@ -1,10 +1,10 @@
 import './assets/main.css'
 
+import { createPinia } from 'pinia'
 import { createApp } from 'vue'
+import { QrcodeStream } from 'vue-qrcode-reader'
 import App from './App.vue'
 import router from './router'
-import { QrcodeStream } from 'vue-qrcode-reader'
-import { createPinia } from 'pinia'
 
 const pinia = createPinia()
 const app = createApp(App)

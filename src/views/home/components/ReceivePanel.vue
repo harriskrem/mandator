@@ -1,80 +1,80 @@
 <script setup lang="ts">
-import PixelProgressBar from "@/components/mandator/PixelProgressBar.vue";
-import ModalScanQr from "@/components/modal/ScanQr.vue";
-import { useDataStore } from "@/store/dataStore";
-import { computed, ref, toRefs } from "vue";
+import { computed, ref, toRefs } from 'vue'
+import { useDataStore } from '@/store/dataStore'
 
-const shareBaseUrl = import.meta.env.VITE_SHARE_BASE_URL || "https://tobefilled.tech";
+const shareBaseUrl =
+  import.meta.env.VITE_SHARE_BASE_URL || 'https://tobefilled.tech'
 
 const props = defineProps<{
-  clientId: string;
-}>();
-const { clientId } = toRefs(props);
+  clientId: string
+}>()
+const { clientId } = toRefs(props)
 
-defineEmits<{
-  (a: "saveFile", b: string): void;
-}>();
+defineEmits<(a: 'saveFile', b: string) => void>()
 
-const dataStore = useDataStore();
-const incomingFiles = computed(() => dataStore.filesToReceive);
-const showUrl = ref(false);
-const copied = ref(false);
-const showQrModal = ref(false);
+const dataStore = useDataStore()
+const incomingFiles = computed(() => dataStore.filesToReceive)
+const showUrl = ref(false)
+const copied = ref(false)
+const showQrModal = ref(false)
 
-const toggleQrModal = () => (showQrModal.value = !showQrModal.value);
+const toggleQrModal = () => (showQrModal.value = !showQrModal.value)
 
 const getShareUrl = () => {
-  const id = encodeURIComponent(clientId.value);
-  return `${shareBaseUrl}/${id}`;
-};
+  const id = encodeURIComponent(clientId.value)
+  return `${shareBaseUrl}/${id}`
+}
 
 const displayValue = computed(() => {
-  return showUrl.value ? getShareUrl() : clientId.value;
-});
+  return showUrl.value ? getShareUrl() : clientId.value
+})
 
 const copyToClipboard = () => {
-  navigator.clipboard.writeText(displayValue.value);
-  copied.value = true;
-  setTimeout(() => (copied.value = false), 2000);
-};
+  navigator.clipboard.writeText(displayValue.value)
+  copied.value = true
+  setTimeout(() => (copied.value = false), 2000)
+}
 
-const incomingEntries = computed(() => Object.entries(incomingFiles.value));
+const incomingEntries = computed(() => Object.entries(incomingFiles.value))
 
 const getProgressPercent = (file: { progress: number; size: number }) => {
-  if (file.size === 0) return 0;
-  return Math.round((file.progress / file.size) * 100);
-};
+  if (file.size === 0) return 0
+  return Math.round((file.progress / file.size) * 100)
+}
 
 const isComplete = (file: { progress: number; size: number }) => {
-  return file.progress > 0 && file.progress === file.size;
-};
+  return file.progress > 0 && file.progress === file.size
+}
 
 const formatSize = (bytes: number) => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
 
 const integrityConfig = {
   verified: {
-    label: "SHA256_OK",
-    className: "border-neon-green/30 bg-neon-green/10 text-neon-green glow-green",
+    label: 'SHA256_OK',
+    className:
+      'border-neon-green/30 bg-neon-green/10 text-neon-green glow-green',
   },
   corrupted: {
-    label: "HASH_FAIL",
-    className: "border-destructive/30 bg-destructive/10 text-destructive glow-red",
+    label: 'HASH_FAIL',
+    className:
+      'border-destructive/30 bg-destructive/10 text-destructive glow-red',
   },
   unverified: {
-    label: "NO_HASH",
-    className: "border-neon-amber/30 bg-neon-amber/10 text-neon-amber glow-amber",
+    label: 'NO_HASH',
+    className:
+      'border-neon-amber/30 bg-neon-amber/10 text-neon-amber glow-amber',
   },
-};
+}
 
 const getIntegrityStatus = (file: { verified?: boolean | null }) => {
-  if (file.verified === true) return "verified" as const;
-  if (file.verified === false) return "corrupted" as const;
-  return "unverified" as const;
-};
+  if (file.verified === true) return 'verified' as const
+  if (file.verified === false) return 'corrupted' as const
+  return 'unverified' as const
+}
 </script>
 
 <template>
@@ -159,9 +159,9 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
           :value="displayValue"
           class="flex-1 h-9 border border-neon-magenta/30 bg-secondary/30 px-3 text-sm text-neon-magenta tracking-wider focus:outline-none font-mono"
         />
-        <button
-          type="button"
-          class="h-9 w-9 border border-border bg-secondary/30 flex items-center justify-center text-muted-foreground hover:text-neon-magenta hover:border-neon-magenta/30 hover:bg-neon-magenta/5 transition-all duration-300"
+        <Button
+          variant="icon"
+          color="magenta"
           aria-label="Show QR code"
           @click="toggleQrModal"
         >
@@ -207,10 +207,9 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
             <path d="M21 12v.01" />
             <path d="M12 21v-1" />
           </svg>
-        </button>
-        <button
-          type="button"
-          class="h-9 w-9 border border-border bg-secondary/30 flex items-center justify-center text-muted-foreground hover:text-neon-cyan hover:border-neon-cyan/30 hover:bg-neon-cyan/5 transition-all duration-300"
+        </Button>
+        <Button
+          variant="icon"
           aria-label="Copy to clipboard"
           @click="copyToClipboard"
         >
@@ -249,7 +248,7 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
             />
             <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
           </svg>
-        </button>
+        </Button>
       </div>
     </template>
 
@@ -292,9 +291,9 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
               >
                 {{ integrityConfig[getIntegrityStatus(receivingFile)].label }}
               </span>
-              <button
-                type="button"
-                class="h-7 w-7 border border-border bg-secondary/30 flex items-center justify-center text-muted-foreground hover:text-neon-cyan hover:border-neon-cyan/30 hover:bg-neon-cyan/5 transition-all duration-300"
+              <Button
+                variant="icon"
+                size="sm"
                 :aria-label="`Download ${receivingFile.filename}`"
                 @click="$emit('saveFile', fileHash)"
               >
@@ -318,7 +317,7 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
                     y2="3"
                   />
                 </svg>
-              </button>
+              </Button>
             </template>
           </div>
         </div>

@@ -1,58 +1,54 @@
 <script setup lang="ts">
-import ConnectionBadge from "@/components/mandator/ConnectionBadge.vue";
-import DropZone from "@/components/mandator/DropZone.vue";
-import PixelProgressBar from "@/components/mandator/PixelProgressBar.vue";
-import ModalScanQr from "@/components/modal/ScanQr.vue";
-import { useDataStore } from "@/store/dataStore";
-import { usePeerStore } from "@/store/peerStore";
-import { computed, ref, toRefs } from "vue";
+import { computed, ref, toRefs } from 'vue'
+import { useDataStore } from '@/store/dataStore'
+import { usePeerStore } from '@/store/peerStore'
 
 const props = defineProps<{
-  isSendButtonDisabled: boolean;
-}>();
-const { isSendButtonDisabled } = toRefs(props);
+  isSendButtonDisabled: boolean
+}>()
+const { isSendButtonDisabled } = toRefs(props)
 
 const emit = defineEmits<{
-  (e: "handleSendButton"): void;
-  (e: "qrDetect", a: any[]): void;
-  (e: "handleFileSelection", a: Event): void;
-  (e: "filesDropped", a: File[]): void;
-}>();
+  (e: 'handleSendButton'): void
+  (e: 'qrDetect', a: { rawValue: string }[]): void
+  (e: 'handleFileSelection', a: Event): void
+  (e: 'filesDropped', a: File[]): void
+}>()
 
-const dataStore = useDataStore();
-const peerStore = usePeerStore();
-const filesToSend = computed(() => dataStore.filesToSend);
-const connectionStatus = computed(() => peerStore.connectionStatus);
-const connectionError = computed(() => peerStore.connectionError);
-const transferError = computed(() => dataStore.transferError);
+const dataStore = useDataStore()
+const peerStore = usePeerStore()
+const filesToSend = computed(() => dataStore.filesToSend)
+const connectionStatus = computed(() => peerStore.connectionStatus)
+const connectionError = computed(() => peerStore.connectionError)
+const transferError = computed(() => dataStore.transferError)
 
 const remoteId = computed({
   get: () => peerStore.remoteId,
   set: (value: string) => peerStore.setRemoteId(value),
-});
+})
 
-const scanQr = ref(false);
-const toggleScan = () => (scanQr.value = !scanQr.value);
+const scanQr = ref(false)
+const toggleScan = () => (scanQr.value = !scanQr.value)
 
-const handleOnQrDetect = (detectedCodes: any[]) => {
-  if (detectedCodes[0].rawValue) {
-    scanQr.value = false;
-    emit("qrDetect", detectedCodes);
+const handleOnQrDetect = (detectedCodes: { rawValue: string }[]) => {
+  if (detectedCodes[0]?.rawValue) {
+    scanQr.value = false
+    emit('qrDetect', detectedCodes)
   }
-};
+}
 
-const fileSendEntries = computed(() => Object.entries(filesToSend.value));
+const fileSendEntries = computed(() => Object.entries(filesToSend.value))
 
 const getProgressPercent = (file: { progress: number; file: File }) => {
-  if (file.file.size === 0) return 0;
-  return Math.round((file.progress / file.file.size) * 100);
-};
+  if (file.file.size === 0) return 0
+  return Math.round((file.progress / file.file.size) * 100)
+}
 
 const formatSize = (bytes: number) => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
 </script>
 
 <template>
@@ -110,9 +106,8 @@ const formatSize = (bytes: number) => {
           class="flex-1 h-9 border border-border bg-secondary/30 px-3 text-sm text-neon-cyan placeholder:text-muted-foreground/40 focus:outline-none focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/20 transition-all font-mono tracking-wider"
           placeholder="enter share code..."
         />
-        <button
-          type="button"
-          class="h-9 w-9 border border-border bg-secondary/30 flex items-center justify-center text-muted-foreground hover:text-neon-cyan hover:border-neon-cyan/30 hover:bg-neon-cyan/5 transition-all duration-300"
+        <Button
+          variant="icon"
           aria-label="Scan QR code"
           @click="toggleScan"
         >
@@ -138,7 +133,7 @@ const formatSize = (bytes: number) => {
               y2="12"
             />
           </svg>
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -184,10 +179,11 @@ const formatSize = (bytes: number) => {
     </div>
 
     <!-- Send button -->
-    <button
-      type="button"
+    <Button
+      variant="primary"
+      size="lg"
+      full-width
       :disabled="isSendButtonDisabled"
-      class="w-full h-11 border border-neon-cyan/50 bg-neon-cyan/10 text-neon-cyan text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-neon-cyan/20 hover:border-neon-cyan glow-cyan hover:glow-cyan-strong transition-all duration-300 disabled:opacity-30 disabled:pointer-events-none"
       @click="emit('handleSendButton')"
     >
       <!-- Send icon -->
@@ -205,6 +201,6 @@ const formatSize = (bytes: number) => {
         <path d="M22 2 11 13" />
       </svg>
       $ send --files *
-    </button>
+    </Button>
   </div>
 </template>
