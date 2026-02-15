@@ -1,6 +1,7 @@
 import type { Socket } from 'socket.io-client'
 import { computed } from 'vue'
 import { usePeerStore } from '@/store/peerStore'
+import { useToastStore } from '@/store/toastStore'
 import {
   handleConnectionOffer,
   handleReceivedCandidate,
@@ -10,13 +11,22 @@ import {
 export default function setupSocketListeners(socket: Socket | null) {
   // socket.io listeners
   const peerStore = usePeerStore()
+  const toastStore = useToastStore()
   const pc = computed(() => peerStore.pc)
   const remoteId = computed(() => peerStore.remoteId)
 
   if (socket) {
     socket.on('connect', () => {
-      // when connected assign the id to the app
       peerStore.setClientId(socket.id ?? '')
+      toastStore.addToast('Signal server connected', 'info')
+    })
+
+    socket.on('disconnect', (reason) => {
+      toastStore.addToast('Signal server disconnected', 'warning')
+    })
+
+    socket.on('connect_error', (err) => {
+      toastStore.addToast('Signal server connection failed', 'error')
     })
 
     socket.on(

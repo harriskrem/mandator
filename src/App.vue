@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import ToastContainer from './components/mandator/ToastContainer.vue'
 import { useSocketStore } from './store/socketStore'
 
 const socketStore = useSocketStore()
@@ -21,4 +22,5 @@ onMounted(() => {
     aria-hidden="true"
   />
   <router-view />
+  <ToastContainer />
 </template>

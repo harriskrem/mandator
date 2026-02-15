@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid'
-import { computed, ref, watchEffect } from 'vue'
+import { computed, onMounted, ref, watch, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 import HeroSection from '@/components/mandator/HeroSection.vue'
 import TerminalTitleBar from '@/components/mandator/TerminalTitleBar.vue'
 import { useWebRTC } from '@/composables/useWebRTC'
 import { useDataStore } from '@/store/dataStore'
 import { usePeerStore } from '@/store/peerStore'
+import { useToastStore } from '@/store/toastStore'
 import saveFile from '@/utils/saveFile'
 import ReceivePanel from './components/ReceivePanel.vue'
 import SendPanel from './components/SendPanel.vue'
 
+const route = useRoute()
 const peerStore = usePeerStore()
 const dataStore = useDataStore()
+const toastStore = useToastStore()
 
 const { handleSend } = useWebRTC()
 
@@ -32,6 +36,7 @@ const onCameraDetect = (detectedCode: { rawValue: string }[]) => {
   const first = detectedCode[0]
   if (first) {
     peerStore.setRemoteId(first.rawValue)
+    toastStore.addToast('QR code scanned', 'info')
   }
 }
 
@@ -41,6 +46,7 @@ const onFileSelection = (event: Event) => {
     for (const file of Array.from(input.files)) {
       const fileId = uuidv4()
       dataStore.setFileToSend(fileId, file)
+      toastStore.addToast(`${file.name} added`, 'info')
     }
   }
 }
@@ -49,6 +55,7 @@ const onFilesDropped = (files: File[]) => {
   for (const file of files) {
     const fileId = uuidv4()
     dataStore.setFileToSend(fileId, file)
+    toastStore.addToast(`${file.name} added`, 'info')
   }
 }
 
@@ -59,6 +66,23 @@ const handleSendButton = () => {
 watchEffect(() => {
   if (remoteId.value) {
     isSendButtonDisabled.value = false
+  }
+})
+
+// Share link auto-connect: /:peerId route
+onMounted(() => {
+  const peerId = route.params.peerId as string | undefined
+  if (peerId) {
+    peerStore.setRemoteId(peerId)
+    setActiveTab('send')
+
+    // Wait for socket connection, then auto-send offer
+    const stop = watch(clientId, (id) => {
+      if (id) {
+        handleSend()
+        stop()
+      }
+    }, { immediate: true })
   }
 })
 </script>

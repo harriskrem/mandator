@@ -1,5 +1,6 @@
 import { MAX_CHUNK_SIZE } from '@/config/constants'
 import { useDataStore } from '@/store/dataStore'
+import { useToastStore } from '@/store/toastStore'
 import type { SendFile } from '@/types/SendFile'
 import { computeFileHash } from '@/utils/computeHash'
 
@@ -17,6 +18,7 @@ export default function sendChunks(
   )
 
   const dataStore = useDataStore()
+  const toastStore = useToastStore()
 
   const progressHandler = (event: MessageEvent) => {
     if (typeof event.data === 'string') {
@@ -41,6 +43,7 @@ export default function sendChunks(
   const sendFileAtIndex = async () => {
     if (currentIndex >= fileHashes.length) {
       dataChannel.removeEventListener('message', progressHandler)
+      toastStore.addToast('Transfer complete', 'success')
       return
     }
 
@@ -58,6 +61,7 @@ export default function sendChunks(
     }
 
     try {
+      toastStore.addToast(`Sending ${fileToSend.file.name}`, 'info')
       const hash = await computeFileHash(fileToSend.file)
 
       dataChannel.send(
@@ -82,6 +86,7 @@ export default function sendChunks(
             fileHash,
             'Data channel closed during transfer',
           )
+          toastStore.addToast('Data channel closed during transfer', 'error')
           dataChannel.removeEventListener('message', progressHandler)
           return
         }
@@ -110,6 +115,7 @@ export default function sendChunks(
       const message =
         error instanceof Error ? error.message : 'Unknown error sending file'
       dataStore.setTransferError(fileHash, message)
+      toastStore.addToast(`Transfer error: ${message}`, 'error')
       console.error('Error sending file:', error)
     }
   }

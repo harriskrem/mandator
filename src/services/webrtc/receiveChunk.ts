@@ -1,4 +1,5 @@
 import { useDataStore } from '@/store/dataStore'
+import { useToastStore } from '@/store/toastStore'
 import type { FileDescription } from '@/types/FileDescription'
 
 export default function receiveChunk(
@@ -9,6 +10,7 @@ export default function receiveChunk(
 
   ev.channel.onmessage = (event) => {
     const dataStore = useDataStore()
+    const toastStore = useToastStore()
 
     if (typeof event.data === 'string') {
       try {
@@ -18,6 +20,7 @@ export default function receiveChunk(
             const fileDesc = data as FileDescription
             dataStore.setFileDescription(fileDesc)
             currentFileId = fileDesc.id
+            toastStore.addToast(`Receiving ${fileDesc.filename}`, 'info')
             break
           }
           case 'complete': {
@@ -32,7 +35,14 @@ export default function receiveChunk(
                     progress: receivedFile.progress,
                   }),
                 )
-                dataStore.verifyFileIntegrity(currentFileId)
+                toastStore.addToast(`${receivedFile.filename} received`, 'success')
+                dataStore.verifyFileIntegrity(currentFileId).then((result) => {
+                  if (result === true) {
+                    toastStore.addToast('SHA256 verified', 'success')
+                  } else if (result === false) {
+                    toastStore.addToast('SHA256 mismatch — file may be corrupted', 'error')
+                  }
+                })
               }
               currentFileId = null
             }

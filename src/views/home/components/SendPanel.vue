@@ -24,8 +24,6 @@ const dataStore = useDataStore()
 const peerStore = usePeerStore()
 const filesToSend = computed(() => dataStore.filesToSend)
 const connectionStatus = computed(() => peerStore.connectionStatus)
-const connectionError = computed(() => peerStore.connectionError)
-const transferError = computed(() => dataStore.transferError)
 
 const remoteId = computed({
   get: () => peerStore.remoteId,
@@ -69,41 +67,14 @@ const formatSize = (bytes: number) => {
       <connection-badge :status="connectionStatus" />
     </div>
 
-    <!-- Error alert - retro terminal style -->
-    <div
-      v-if="connectionError"
-      class="border border-destructive/30 bg-destructive/5 p-3 glow-red"
-    >
-      <div class="flex items-start gap-2">
-        <span class="text-[0.625rem] text-destructive shrink-0 mt-0.5 uppercase tracking-wider">
-          [err]
-        </span>
-        <p class="text-xs text-destructive/80">
-          {{ connectionError }}
-        </p>
-      </div>
-    </div>
-
-    <!-- Transfer error -->
-    <div
-      v-if="transferError"
-      class="border border-destructive/30 bg-destructive/5 p-3 glow-red"
-    >
-      <div class="flex items-start gap-2">
-        <span class="text-[0.625rem] text-destructive shrink-0 mt-0.5 uppercase tracking-wider">
-          [err]
-        </span>
-        <p class="text-xs text-destructive/80">
-          Transfer error: {{ transferError.message }}
-        </p>
-      </div>
-    </div>
-
     <!-- Peer code input -->
     <div>
-      <label class="block text-[0.625rem] text-muted-foreground mb-2 uppercase tracking-wider">
+      <label class="block text-[0.625rem] text-muted-foreground mb-1 uppercase tracking-wider">
         $ remote_peer --code
       </label>
+      <p class="text-[0.625rem] text-muted-foreground/50 mb-2">
+        // paste the code from your receiver
+      </p>
       <div class="flex gap-2">
         <input
           v-model="remoteId"

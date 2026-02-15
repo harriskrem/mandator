@@ -4,6 +4,7 @@ import PixelProgressBar from '@/components/mandator/PixelProgressBar.vue'
 import ModalScanQr from '@/components/modal/ScanQr.vue'
 import Button from '@/components/ui/Button.vue'
 import { useDataStore } from '@/store/dataStore'
+import { useToastStore } from '@/store/toastStore'
 
 const shareBaseUrl =
   import.meta.env.VITE_SHARE_BASE_URL || 'https://mandator.xyz'
@@ -16,8 +17,9 @@ const { clientId } = toRefs(props)
 defineEmits<(a: 'saveFile', b: string) => void>()
 
 const dataStore = useDataStore()
+const toastStore = useToastStore()
 const incomingFiles = computed(() => dataStore.filesToReceive)
-const showUrl = ref(false)
+const showUrl = ref(true)
 const copied = ref(false)
 const showQrModal = ref(false)
 
@@ -35,6 +37,7 @@ const displayValue = computed(() => {
 const copyToClipboard = () => {
   navigator.clipboard.writeText(displayValue.value)
   copied.value = true
+  toastStore.addToast('Copied to clipboard', 'success')
   setTimeout(() => (copied.value = false), 2000)
 }
 
@@ -87,6 +90,11 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
   />
 
   <div class="flex flex-col gap-5">
+    <!-- Instructions -->
+    <p class="text-[0.625rem] text-muted-foreground/50">
+      // share this code or link with the sender
+    </p>
+
     <!-- Toggle label + switch -->
     <div class="flex items-center justify-between">
       <label class="text-[0.625rem] text-muted-foreground uppercase tracking-wider">

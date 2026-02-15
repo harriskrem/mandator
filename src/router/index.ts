@@ -9,6 +9,11 @@ const router = createRouter({
       name: 'home',
       component: Home,
     },
+    {
+      path: '/:peerId',
+      name: 'share',
+      component: Home,
+    },
   ],
 })
 

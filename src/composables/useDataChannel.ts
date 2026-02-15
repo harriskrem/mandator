@@ -12,5 +12,9 @@ export function useDataChannel() {
   )
   dataChannel.binaryType = 'arraybuffer'
 
+  dataChannel.onopen = () => console.log('[useDataChannel] dataChannel OPEN')
+  dataChannel.onclose = () => console.log('[useDataChannel] dataChannel CLOSED')
+  dataChannel.onerror = (e) => console.error('[useDataChannel] dataChannel ERROR:', e)
+
   return { dataChannel }
 }
