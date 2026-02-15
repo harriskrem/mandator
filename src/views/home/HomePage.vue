@@ -90,7 +90,7 @@ watchEffect(() => {
             <!-- Tab bar -->
             <div class="relative flex border-b border-border bg-secondary/20">
               <div
-                class="cyber-tab-rail pointer-events-none absolute bottom-0 left-0 h-px w-1/2 transition-transform duration-200 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+                class="cyber-tab-rail pointer-events-none absolute bottom-0 left-0 h-px w-1/2 transition-transform duration-100 [transition-timing-function:steps(3,jump-none)] motion-reduce:transition-none"
                 :class="
                   activeTab === 'send'
                     ? 'translate-x-0 bg-neon-cyan/80 glow-cyan'
@@ -179,56 +179,62 @@ watchEffect(() => {
 .cyber-tab-panel {
   position: relative;
   isolation: isolate;
-  will-change: opacity, transform, filter;
-  transition:
-    opacity 160ms ease-out,
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 220ms ease-out;
+  will-change: opacity, transform;
 }
 
+/* Scanline overlay that sweeps on activation */
 .cyber-tab-panel::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   opacity: 0;
-  background:
-    linear-gradient(
-      180deg,
-      transparent 0%,
-      hsl(var(--tab-tone) / 0.18) 46%,
-      transparent 100%
-    ),
-    repeating-linear-gradient(
-      180deg,
-      transparent,
-      transparent 0.1875rem,
-      hsl(var(--tab-tone) / 0.08) 0.1875rem,
-      hsl(var(--tab-tone) / 0.08) 0.25rem
-    );
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    hsl(var(--tab-tone) / 0.06) 2px,
+    hsl(var(--tab-tone) / 0.06) 4px
+  );
   mix-blend-mode: screen;
-  transform: translate3d(0, -105%, 0);
-  will-change: opacity, transform;
+  z-index: 10;
+}
+
+/* Horizontal glitch-line that flashes across */
+.cyber-tab-panel::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  top: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: hsl(var(--tab-tone) / 0.7);
+  box-shadow: 0 0 8px hsl(var(--tab-tone) / 0.5);
+  z-index: 11;
 }
 
 .cyber-tab-panel--active {
   opacity: 1;
-  transform: translate3d(0, 0, 0);
-  filter: blur(0) brightness(1);
+  transform: none;
   z-index: 2;
-  animation: tab-terminal-refresh 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: tab-glitch-in 180ms steps(4, jump-none) both;
 }
 
 .cyber-tab-panel--active::before {
-  animation: tab-scan-sweep 340ms ease-out both;
+  animation: tab-scanlines 200ms linear both;
+}
+
+.cyber-tab-panel--active::after {
+  animation: tab-glitch-line 150ms steps(3) both;
 }
 
 .cyber-tab-panel--inactive {
   opacity: 0;
-  transform: translate3d(calc(var(--tab-shift, 1) * -0.35rem), 0.375rem, 0)
-    scale(0.992);
-  filter: blur(0.1rem) brightness(0.82) saturate(0.86);
+  transform: translate3d(0, 0, 0);
   z-index: 1;
+  transition: opacity 0ms 80ms;
 }
 
 .cyber-tab-panel--cyan {
@@ -239,47 +245,73 @@ watchEffect(() => {
   --tab-tone: 320 80% 60%;
 }
 
-@keyframes tab-terminal-refresh {
+/* Hard glitch entrance — no blur, no scale, just offset + flicker */
+@keyframes tab-glitch-in {
   0% {
     opacity: 0;
-    transform: translate3d(calc(var(--tab-shift, 1) * 0.45rem), 0.5rem, 0)
-      scale(0.992);
-    filter: blur(0.125rem) brightness(1.25) contrast(1.06);
+    transform: translate3d(calc(var(--tab-shift, 1) * 6px), 0, 0);
+    clip-path: inset(0 0 100% 0);
+  }
+  25% {
+    opacity: 1;
+    transform: translate3d(calc(var(--tab-shift, 1) * -3px), 0, 0);
+    clip-path: inset(0 0 20% 0);
   }
   50% {
-    opacity: 0.88;
-    transform: translate3d(calc(var(--tab-shift, 1) * 0.12rem), 0.1rem, 0)
-      scale(1);
-    filter: blur(0.04rem) brightness(1.12) contrast(1.04);
+    opacity: 0.6;
+    transform: translate3d(calc(var(--tab-shift, 1) * 2px), 0, 0);
+    clip-path: inset(0 0 0 0);
+  }
+  75% {
+    opacity: 1;
+    transform: translate3d(calc(var(--tab-shift, 1) * -1px), 0, 0);
+    clip-path: inset(0 0 0 0);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
-    filter: blur(0) brightness(1) contrast(1);
+    transform: none;
+    clip-path: inset(0 0 0 0);
   }
 }
 
-@keyframes tab-scan-sweep {
+/* Brief scanline interference */
+@keyframes tab-scanlines {
   0% {
-    opacity: 0;
-    transform: translate3d(0, -105%, 0);
+    opacity: 0.8;
   }
-  14% {
-    opacity: 0.85;
-  }
-  70% {
-    opacity: 0.35;
+  60% {
+    opacity: 0.4;
   }
   100% {
     opacity: 0;
-    transform: translate3d(0, 110%, 0);
+  }
+}
+
+/* Horizontal glitch line sweeping through */
+@keyframes tab-glitch-line {
+  0% {
+    opacity: 0.9;
+    top: 0%;
+  }
+  33% {
+    opacity: 0.7;
+    top: 40%;
+  }
+  66% {
+    opacity: 0.5;
+    top: 80%;
+  }
+  100% {
+    opacity: 0;
+    top: 100%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cyber-tab-panel,
   .cyber-tab-panel--active,
-  .cyber-tab-panel::before {
+  .cyber-tab-panel::before,
+  .cyber-tab-panel::after {
     animation: none !important;
     transition: none !important;
   }

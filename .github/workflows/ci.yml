@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -9,18 +9,17 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: yarn
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: corepack enable && yarn install --immutable
 
       - name: Type check
         run: yarn type-check
@@ -30,3 +29,15 @@ jobs:
 
       - name: Test
         run: yarn test
+
+      - name: Verify Docker build
+        run: docker build --build-arg VITE_SIGNAL_SERVER_URL=https://placeholder.test -t mandator-check .
+
+  deploy:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Coolify deployment
+        run: |
+          curl -sf "${{ secrets.COOLIFY_WEBHOOK_URL }}"
