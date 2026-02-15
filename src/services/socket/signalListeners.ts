@@ -60,5 +60,12 @@ export default function setupSocketListeners(socket: Socket | null) {
     socket.on('get_id', ({ peerId }: { peerId: string }) => {
       peerStore.setRemoteId(peerId)
     })
+
+    socket.on('peer_disconnected', ({ peerId }: { peerId: string }) => {
+      if (peerId === peerStore.remoteId) {
+        peerStore.resetPeerConnection()
+        toastStore.addToast('Peer disconnected', 'warning')
+      }
+    })
   }
 }

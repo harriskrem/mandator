@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid'
-import { computed, onMounted, ref, watch, watchEffect } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import HeroSection from '@/components/mandator/HeroSection.vue'
 import TerminalTitleBar from '@/components/mandator/TerminalTitleBar.vue'
@@ -21,10 +21,28 @@ const { handleSend } = useWebRTC()
 
 const clientId = computed(() => peerStore.clientId)
 const remoteId = computed(() => peerStore.remoteId)
+const connectionStatus = computed(() => peerStore.connectionStatus)
+const dataChannelStatus = computed(() => peerStore.dataChannelStatus)
 
 const activeTab = ref<'send' | 'receive'>('send')
 const tabSwitchDirection = ref<1 | -1>(1)
-const isSendButtonDisabled = ref<boolean>(true)
+
+const canSend = computed(() => {
+  // Allow initiating connection when disconnected/failed with a remote ID
+  if (
+    (connectionStatus.value === 'disconnected' ||
+      connectionStatus.value === 'failed') &&
+    remoteId.value
+  )
+    return true
+  // Allow sending when fully connected with open data channel
+  if (
+    connectionStatus.value === 'connected' &&
+    dataChannelStatus.value === 'open'
+  )
+    return true
+  return false
+})
 
 const setActiveTab = (tab: 'send' | 'receive') => {
   if (tab === activeTab.value) return
@@ -58,22 +76,8 @@ const onFilesDropped = (files: File[]) => {
 }
 
 const handleSendButton = () => {
-  isSendButtonDisabled.value = true
   handleSend()
 }
-
-watchEffect(() => {
-  if (remoteId.value) {
-    isSendButtonDisabled.value = false
-  }
-})
-
-watch(() => dataStore.sendComplete, (done) => {
-  if (done) {
-    isSendButtonDisabled.value = false
-    dataStore.setSendComplete(false)
-  }
-})
 
 // Share link auto-connect: /:peerId route
 onMounted(() => {
@@ -83,12 +87,16 @@ onMounted(() => {
     setActiveTab('send')
 
     // Wait for socket connection, then auto-send offer
-    const stop = watch(clientId, (id) => {
-      if (id) {
-        handleSend()
-        stop()
-      }
-    }, { immediate: true })
+    const stop = watch(
+      clientId,
+      (id) => {
+        if (id) {
+          handleSend()
+          stop()
+        }
+      },
+      { immediate: true },
+    )
   }
 })
 </script>
@@ -174,7 +182,7 @@ onMounted(() => {
                 :inert="activeTab !== 'send'"
               >
                 <send-panel
-                  :is-send-button-disabled="isSendButtonDisabled"
+                  :is-send-button-disabled="!canSend"
                   @qr-detect="onCameraDetect"
                   @handle-file-selection="onFileSelection"
                   @handle-send-button="handleSendButton"
