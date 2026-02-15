@@ -19,7 +19,7 @@ defineEmits<(a: 'saveFile', b: string) => void>()
 const dataStore = useDataStore()
 const toastStore = useToastStore()
 const incomingFiles = computed(() => dataStore.filesToReceive)
-const showUrl = ref(true)
+const showUrl = ref(false)
 const copied = ref(false)
 const showQrModal = ref(false)
 
