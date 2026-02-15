@@ -35,7 +35,7 @@
 
     <!-- Tagline -->
     <p class="mt-4 text-foreground/70 text-sm leading-relaxed max-w-sm text-balance">
-      &gt; Peer-to-peer file transfer.
+      &gt; Peer-to-peer file transfer. </br>
       <span class="text-neon-cyan/80">No servers.</span>
       <span class="text-neon-magenta/80">No traces.</span>
       <span class="text-neon-amber/80">Just trust.</span>

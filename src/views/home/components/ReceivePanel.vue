@@ -6,7 +6,7 @@ import Button from '@/components/ui/Button.vue'
 import { useDataStore } from '@/store/dataStore'
 
 const shareBaseUrl =
-  import.meta.env.VITE_SHARE_BASE_URL || 'https://tobefilled.tech'
+  import.meta.env.VITE_SHARE_BASE_URL || 'https://mandator.xyz'
 
 const props = defineProps<{
   clientId: string

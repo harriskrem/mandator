@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import Button from '@/components/ui/Button.vue'
 
 const emit = defineEmits<{
   (e: 'filesDropped', files: File[]): void
