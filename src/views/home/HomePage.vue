@@ -46,7 +46,6 @@ const onFileSelection = (event: Event) => {
     for (const file of Array.from(input.files)) {
       const fileId = uuidv4()
       dataStore.setFileToSend(fileId, file)
-      toastStore.addToast(`${file.name} added`, 'info')
     }
   }
 }
@@ -55,17 +54,24 @@ const onFilesDropped = (files: File[]) => {
   for (const file of files) {
     const fileId = uuidv4()
     dataStore.setFileToSend(fileId, file)
-    toastStore.addToast(`${file.name} added`, 'info')
   }
 }
 
 const handleSendButton = () => {
+  isSendButtonDisabled.value = true
   handleSend()
 }
 
 watchEffect(() => {
   if (remoteId.value) {
     isSendButtonDisabled.value = false
+  }
+})
+
+watch(() => dataStore.sendComplete, (done) => {
+  if (done) {
+    isSendButtonDisabled.value = false
+    dataStore.setSendComplete(false)
   }
 })
 

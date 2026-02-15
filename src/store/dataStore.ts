@@ -17,12 +17,14 @@ export const useDataStore = defineStore('data', () => {
   const recFileIdRef = ref<string | undefined>()
   const sendFileIdRef = ref<string | undefined>()
   const transferErrorRef = ref<TransferError | null>(null)
+  const sendCompleteRef = ref(false)
 
   const filesToReceive = computed(() => filesToReceiveRef.value)
   const filesToSend = computed(() => filesToSendRef.value)
   const recFileId = computed(() => recFileIdRef.value)
   const sendFileId = computed(() => sendFileIdRef.value)
   const transferError = computed(() => transferErrorRef.value)
+  const sendComplete = computed(() => sendCompleteRef.value)
 
   const setFileDescription = (value: FileDescription) => {
     filesToReceiveRef.value[value.id] = {
@@ -84,12 +86,17 @@ export const useDataStore = defineStore('data', () => {
     transferErrorRef.value = null
   }
 
+  const setSendComplete = (value: boolean) => {
+    sendCompleteRef.value = value
+  }
+
   const resetData = () => {
     filesToReceiveRef.value = {}
     filesToSendRef.value = {}
     recFileIdRef.value = undefined
     sendFileIdRef.value = undefined
     transferErrorRef.value = null
+    sendCompleteRef.value = false
   }
 
   return {
@@ -98,6 +105,7 @@ export const useDataStore = defineStore('data', () => {
     recFileId,
     sendFileId,
     transferError,
+    sendComplete,
     setFileDescription,
     setReceivedChunks,
     setDataSentProgress,
@@ -105,6 +113,7 @@ export const useDataStore = defineStore('data', () => {
     setSendFileId,
     setTransferError,
     clearTransferError,
+    setSendComplete,
     verifyFileIntegrity,
     resetData,
   }

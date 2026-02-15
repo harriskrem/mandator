@@ -43,6 +43,7 @@ export default function sendChunks(
   const sendFileAtIndex = async () => {
     if (currentIndex >= fileHashes.length) {
       dataChannel.removeEventListener('message', progressHandler)
+      dataStore.setSendComplete(true)
       toastStore.addToast('Transfer complete', 'success')
       return
     }
