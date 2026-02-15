@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, toRefs } from 'vue'
+import PixelProgressBar from '@/components/mandator/PixelProgressBar.vue'
+import ModalScanQr from '@/components/modal/ScanQr.vue'
+import Button from '@/components/ui/Button.vue'
 import { useDataStore } from '@/store/dataStore'
 
 const shareBaseUrl =

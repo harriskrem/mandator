@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Level, RenderAs } from 'qrcode.vue'
+import QrcodeVue from 'qrcode.vue'
 import { ref } from 'vue'
 
 const { qrValue } = defineProps<{

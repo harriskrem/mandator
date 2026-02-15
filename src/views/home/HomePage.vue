@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid'
 import { computed, ref, watchEffect } from 'vue'
+import HeroSection from '@/components/mandator/HeroSection.vue'
+import TerminalTitleBar from '@/components/mandator/TerminalTitleBar.vue'
 import { useWebRTC } from '@/composables/useWebRTC'
 import { useDataStore } from '@/store/dataStore'
 import { usePeerStore } from '@/store/peerStore'
 import saveFile from '@/utils/saveFile'
+import ReceivePanel from './components/ReceivePanel.vue'
+import SendPanel from './components/SendPanel.vue'
 
 const peerStore = usePeerStore()
 const dataStore = useDataStore()
