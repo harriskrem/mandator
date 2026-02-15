@@ -19,3 +19,11 @@ npm run dev
 ```sh
 npm run build
 ```
+
+## Environment Variables
+
+Create `.env` from `.env.example` and set:
+
+- `VITE_SIGNAL_SERVER_URL`: public URL of the signal server (for example `https://backend.mandator.xyz`)
+- `VITE_SHARE_BASE_URL`: public URL of the frontend (for example `https://mandator.xyz`)
+- `VITE_TURN_USERNAME`, `VITE_TURN_CREDENTIAL`: TURN credentials (optional, but recommended for NAT traversal)

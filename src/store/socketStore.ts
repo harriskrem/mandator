@@ -12,7 +12,9 @@ export const useSocketStore: StoreDefinition = defineStore('socket', () => {
   
   // Setters
   const initializeSocket = () => {
-    socket.value = io();
+    const signalServerUrl = import.meta.env.VITE_SIGNAL_SERVER_URL?.trim();
+
+    socket.value = signalServerUrl ? io(signalServerUrl) : io();
     setupSocketListeners(socket.value);
   };
 
