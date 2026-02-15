@@ -27,12 +27,14 @@ const dataChannelStatus = computed(() => peerStore.dataChannelStatus)
 const activeTab = ref<'send' | 'receive'>('send')
 const tabSwitchDirection = ref<1 | -1>(1)
 
+const hasFiles = computed(() => Object.keys(dataStore.filesToSend).length > 0)
+
 const canSend = computed(() => {
-  // Allow initiating connection when disconnected/failed with a remote ID
+  if (!remoteId.value || !hasFiles.value) return false
+  // Allow initiating connection when disconnected/failed
   if (
-    (connectionStatus.value === 'disconnected' ||
-      connectionStatus.value === 'failed') &&
-    remoteId.value
+    connectionStatus.value === 'disconnected' ||
+    connectionStatus.value === 'failed'
   )
     return true
   // Allow sending when fully connected with open data channel

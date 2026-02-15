@@ -27,7 +27,9 @@ export function useWebRTC() {
         resolve(false)
         return
       }
+      const timeout = setTimeout(() => resolve(false), 5000)
       s.emit('check_peer', { peerId }, ({ exists }: { exists: boolean }) => {
+        clearTimeout(timeout)
         resolve(exists)
       })
     })
@@ -37,7 +39,11 @@ export function useWebRTC() {
     const iceState = pc.value.iceConnectionState
 
     // Reset stale connections
-    if (iceState === 'failed' || iceState === 'closed') {
+    if (
+      iceState === 'failed' ||
+      iceState === 'closed' ||
+      iceState === 'disconnected'
+    ) {
       peerStore.resetPeerConnection()
     }
 
