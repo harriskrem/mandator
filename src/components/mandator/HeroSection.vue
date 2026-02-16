@@ -85,7 +85,7 @@
 
     <!-- Animated lock decoration -->
     <div
-      class="relative mt-8 animate-float"
+      class="relative mt-8 animate-float hidden md:block"
       aria-hidden="true"
     >
       <div class="relative flex items-center justify-center">

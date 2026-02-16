@@ -49,13 +49,14 @@ export const useDataStore = defineStore('data', () => {
     return verified
   }
 
-  const setReceivedChunks = (value: Blob) => {
+  const setReceivedChunks = (value: Blob | ArrayBuffer) => {
     const fileId = recFileIdRef.value
     if (!fileId) return
     const file = filesToReceiveRef.value[fileId]
     if (!file) return
-    file.chunks.push(value)
-    file.progress = new Blob(file.chunks).size
+    const chunkSize = value instanceof Blob ? value.size : value.byteLength
+    file.chunks.push(value instanceof Blob ? value : new Blob([value]))
+    file.progress += chunkSize
   }
 
   const setFileToSend = (fileId: string, fileToSend: File) => {
@@ -63,6 +64,7 @@ export const useDataStore = defineStore('data', () => {
       filesToSendRef.value[fileId] = {
         file: fileToSend,
         progress: 0,
+        sent: false,
       }
     }
   }
@@ -84,6 +86,25 @@ export const useDataStore = defineStore('data', () => {
 
   const clearTransferError = () => {
     transferErrorRef.value = null
+  }
+
+  const markFileAsSent = (fileId: string) => {
+    const file = filesToSendRef.value[fileId]
+    if (file) {
+      file.sent = true
+    }
+  }
+
+  const markFileForResend = (oldFileId: string, newFileId: string) => {
+    const oldEntry = filesToSendRef.value[oldFileId]
+    if (!oldEntry) return
+    delete filesToSendRef.value[oldFileId]
+    filesToSendRef.value[newFileId] = {
+      file: oldEntry.file,
+      progress: 0,
+      sent: false,
+    }
+    sendCompleteRef.value = false
   }
 
   const setSendComplete = (value: boolean) => {
@@ -113,6 +134,8 @@ export const useDataStore = defineStore('data', () => {
     setSendFileId,
     setTransferError,
     clearTransferError,
+    markFileAsSent,
+    markFileForResend,
     setSendComplete,
     verifyFileIntegrity,
     resetData,

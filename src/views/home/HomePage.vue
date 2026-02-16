@@ -118,7 +118,7 @@ onMounted(() => {
     />
 
     <div class="w-full max-w-6xl mx-auto">
-      <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center lg:items-stretch">
+      <div class="flex flex-col lg:flex-row lg:gap-12 items-center lg:items-stretch">
         <!-- Left side: Hero -->
         <div class="w-full lg:w-5/12 flex flex-col">
           <hero-section />

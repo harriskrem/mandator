@@ -7,7 +7,6 @@ export const PEER_ID_LENGTH = 20
 /** Data channel configuration */
 export const DATA_CHANNEL_CONFIG: RTCDataChannelInit = {
   ordered: true,
-  maxRetransmits: 10,
 }
 
 /** Data channel label */
