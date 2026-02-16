@@ -8,7 +8,7 @@ const props = defineProps<{
 }>()
 
 const statusConfig: Record<
-  ConnectionStatus,
+  ConnectionStatus | 'connectedEncrypted',
   { label: string; tooltip: string; dotClass: string; textClass: string; containerClass: string }
 > = {
   disconnected: {

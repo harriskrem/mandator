@@ -29,7 +29,7 @@ export async function encryptChunk(
   chunkIndex: number,
 ): Promise<{ iv: Uint8Array; ciphertext: ArrayBuffer }> {
   const iv = buildIV(fileId, chunkIndex)
-  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, chunk)
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv as Uint8Array<ArrayBuffer> }, key, chunk)
   return { iv, ciphertext }
 }
 
@@ -38,7 +38,7 @@ export async function decryptChunk(
   ciphertext: ArrayBuffer,
   key: CryptoKey,
 ): Promise<ArrayBuffer> {
-  return crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext)
+  return crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv as Uint8Array<ArrayBuffer> }, key, ciphertext)
 }
 
 /**
@@ -67,7 +67,7 @@ export function unpackEncryptedMessage(data: ArrayBuffer): {
   ciphertext: ArrayBuffer
 } {
   const view = new Uint8Array(data)
-  const typeFlag = view[0]
+  const typeFlag = view[0]!
   const iv = view.slice(1, 13)
   const ciphertext = view.slice(13).buffer
   return { typeFlag, iv, ciphertext }

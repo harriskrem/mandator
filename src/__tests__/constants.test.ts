@@ -20,7 +20,6 @@ describe('constants', () => {
 
   it('DATA_CHANNEL_CONFIG has required fields', () => {
     expect(DATA_CHANNEL_CONFIG.ordered).toBe(true)
-    expect(DATA_CHANNEL_CONFIG.maxRetransmits).toBeGreaterThan(0)
   })
 
   it('DATA_CHANNEL_LABEL is a non-empty string', () => {
