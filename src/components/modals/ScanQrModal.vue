@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import TerminalTitleBar from '@/components/mandator/TerminalTitleBar.vue'
-import QrCode from '@/components/QrCode.vue'
+import TerminalTitleBar from '@/components/ui/TerminalTitleBar.vue'
+import QrCode from '@/components/ui/QrCode.vue'
 import Button from '@/components/ui/Button.vue'
 
 const { selfCode, scanQr } = defineProps<{

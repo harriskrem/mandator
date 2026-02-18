@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, toRefs } from 'vue'
-import PixelProgressBar from '@/components/mandator/PixelProgressBar.vue'
-import ModalScanQr from '@/components/modal/ScanQr.vue'
+import PixelProgressBar from '@/components/ui/PixelProgressBar.vue'
+import ModalScanQr from '@/components/modals/ScanQrModal.vue'
 import Button from '@/components/ui/Button.vue'
 import { useDataStore } from '@/store/dataStore'
 import { useToastStore } from '@/store/toastStore'

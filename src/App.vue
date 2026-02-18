@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import ToastContainer from './components/mandator/ToastContainer.vue'
+import ToastContainer from './components/feedback/ToastContainer.vue'
 import { useSocketStore } from './store/socketStore'
 
 const socketStore = useSocketStore()
