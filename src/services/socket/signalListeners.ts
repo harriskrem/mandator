@@ -2,7 +2,6 @@ import type { Socket } from 'socket.io-client'
 import { computed } from 'vue'
 import { usePeerStore } from '@/store/peerStore'
 import { useToastStore } from '@/store/toastStore'
-import { deriveEncryptionKey, computeFingerprint } from '@/crypto/keyExchange'
 import {
   handleConnectionOffer,
   handleReceivedCandidate,
@@ -35,14 +34,12 @@ export default function setupSocketListeners(socket: Socket | null) {
       ({
         offer,
         peerId,
-        ecdhPublicKey,
       }: {
         offer: RTCSessionDescriptionInit
         peerId: string
-        ecdhPublicKey?: JsonWebKey
       }) => {
         remoteId.value === '' && peerStore.setRemoteId(peerId)
-        handleConnectionOffer({ pc: pc.value, offer, socket, peerId, ecdhPublicKey })
+        handleConnectionOffer({ pc: pc.value, offer, socket, peerId })
       },
     )
 
@@ -50,24 +47,10 @@ export default function setupSocketListeners(socket: Socket | null) {
       'get_answer',
       async ({
         answer,
-        ecdhPublicKey,
       }: {
         answer: RTCSessionDescriptionInit
-        ecdhPublicKey?: JsonWebKey
       }) => {
         processAnswer(pc.value, answer)
-
-        // Derive encryption key from the answerer's public key
-        if (ecdhPublicKey && peerStore.ecdhKeyPair) {
-          const encKey = await deriveEncryptionKey(
-            peerStore.ecdhKeyPair.privateKey,
-            ecdhPublicKey,
-          )
-          peerStore.setEncryptionKey(encKey)
-
-          const peerFp = await computeFingerprint(ecdhPublicKey)
-          peerStore.setFingerprints(peerStore.selfFingerprint, peerFp)
-        }
       },
     )
 

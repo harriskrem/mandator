@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid'
 import { computed, ref, toRefs } from 'vue'
-import ConnectionBadge from '@/components/feedback/ConnectionBadge.vue'
 import DropZone from '@/components/ui/DropZone.vue'
 import PixelProgressBar from '@/components/ui/PixelProgressBar.vue'
 import ModalScanQr from '@/components/modals/ScanQrModal.vue'
@@ -24,7 +23,6 @@ const emit = defineEmits<{
 const dataStore = useDataStore()
 const peerStore = usePeerStore()
 const filesToSend = computed(() => dataStore.filesToSend)
-const connectionStatus = computed(() => peerStore.connectionStatus)
 
 const remoteId = computed({
   get: () => peerStore.remoteId,
@@ -68,11 +66,6 @@ const handleResend = (fileId: string) => {
   />
 
   <div class="flex flex-col gap-5">
-    <!-- Connection status badge -->
-    <div class="flex justify-end">
-      <connection-badge :status="connectionStatus" :encrypted="peerStore.isEncrypted" />
-    </div>
-
     <!-- Peer code input -->
     <div>
       <label class="block text-[0.625rem] text-muted-foreground mb-1 uppercase tracking-wider">
