@@ -10,6 +10,11 @@ const router = createRouter({
       component: Home,
     },
     {
+      path: '/about',
+      name: 'about',
+      component: () => import('@/views/about/AboutPage.vue'),
+    },
+    {
       path: '/:peerId',
       name: 'share',
       component: Home,

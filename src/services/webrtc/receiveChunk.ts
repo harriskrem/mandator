@@ -7,6 +7,8 @@ export default function receiveChunk(
   dataChannel: RTCDataChannel,
 ) {
   let currentFileId: string | null = null
+  let lastProgressTime = 0
+  const PROGRESS_THROTTLE_MS = 250
 
   // Serialize async message handling to ensure OPFS writes complete in order
   let writeQueue = Promise.resolve()
@@ -45,6 +47,7 @@ export default function receiveChunk(
         const fileDesc = data as unknown as FileDescription
         await dataStore.setFileDescription(fileDesc)
         currentFileId = fileDesc.id
+        lastProgressTime = 0
         toastStore.addToast(`Receiving ${fileDesc.filename}`, 'info')
         break
       }
@@ -87,6 +90,9 @@ export default function receiveChunk(
     dc: RTCDataChannel,
   ) {
     if (!currentFileId) return
+    const now = performance.now()
+    if (now - lastProgressTime < PROGRESS_THROTTLE_MS) return
+    lastProgressTime = now
     const receivedFile = dataStore.filesToReceive[currentFileId]
     if (receivedFile) {
       sendProgressMsg(dc, currentFileId, receivedFile.progress)

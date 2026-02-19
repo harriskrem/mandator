@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 </script>
 
 <template>
@@ -36,7 +37,7 @@
     <!-- Tagline -->
     <p class="mt-4 text-foreground/70 text-sm leading-relaxed max-w-sm text-balance">
       &gt; Peer-to-peer file transfer. <br>
-      <span class="text-neon-cyan/80">No servers.</span>
+      <span class="text-neon-cyan/80">No middlemen.</span>
       <span class="text-neon-magenta/80"> No traces.</span>
       <span class="text-neon-amber/80"> Just trust.</span>
     </p>
@@ -149,9 +150,16 @@
     <!-- Bottom decorative line -->
     <div class="hidden lg:block mt-auto pt-8 w-full">
       <div class="h-px bg-gradient-to-r from-neon-cyan/30 via-neon-magenta/20 to-transparent" />
-      <p class="mt-3 text-[0.625rem] text-muted-foreground/60 uppercase tracking-widest">
-        // v0.1.0 | pid:4821 | uptime:03:42:17
-      </p>
+      <div class="mt-3 flex items-center gap-3 text-[0.625rem] text-muted-foreground/60 uppercase tracking-widest">
+        <span>// v0.1.0 | pid:4821 | uptime:03:42:17</span>
+        <span class="text-border">|</span>
+        <RouterLink
+          to="/about"
+          class="text-neon-cyan/40 hover:text-neon-cyan transition-colors"
+        >
+          about
+        </RouterLink>
+      </div>
     </div>
   </section>
 </template>

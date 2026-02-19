@@ -93,7 +93,7 @@ export const useDataStore = defineStore('data', () => {
 
     if (file.writable) {
       // OPFS mode: write directly to disk
-      await file.writable.write(value instanceof Blob ? value : new Blob([value]))
+      await file.writable.write(value)
     } else if (file.chunks) {
       // Fallback: accumulate in memory
       file.chunks.push(value instanceof Blob ? value : new Blob([value]))

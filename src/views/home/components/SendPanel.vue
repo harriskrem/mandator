@@ -23,6 +23,7 @@ const emit = defineEmits<{
 const dataStore = useDataStore()
 const peerStore = usePeerStore()
 const filesToSend = computed(() => dataStore.filesToSend)
+const connectionRoute = computed(() => peerStore.connectionRoute)
 
 const remoteId = computed({
   get: () => peerStore.remoteId,
@@ -71,9 +72,26 @@ const handleResend = (fileId: string) => {
       <label class="block text-[0.625rem] text-muted-foreground mb-1 uppercase tracking-wider">
         $ remote_peer --code
       </label>
-      <p class="text-[0.625rem] text-muted-foreground/50 mb-2">
-        // paste the code from your receiver
-      </p>
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-[0.625rem] text-muted-foreground/50">
+          // paste the code from your receiver
+        </p>
+        <span
+          v-if="connectionRoute"
+          class="relative inline-flex items-center gap-1 text-[0.625rem] uppercase tracking-widest group"
+          :class="connectionRoute === 'direct'
+            ? 'text-neon-green'
+            : 'text-neon-amber'"
+        >
+          {{ connectionRoute === 'direct' ? '[DIRECT]' : '[RELAYED]' }}
+          <span class="opacity-50 group-hover:opacity-100 transition-opacity cursor-help">[i]</span>
+          <span class="route-tooltip">
+            {{ connectionRoute === 'direct'
+              ? 'Data flows directly between you and the peer — no servers involved'
+              : 'A TURN relay server is forwarding your encrypted data — slower but still end-to-end encrypted' }}
+          </span>
+        </span>
+      </div>
       <div class="flex gap-2">
         <input
           v-model="remoteId"

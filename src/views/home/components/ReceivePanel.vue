@@ -4,6 +4,7 @@ import PixelProgressBar from '@/components/ui/PixelProgressBar.vue'
 import ModalScanQr from '@/components/modals/ScanQrModal.vue'
 import Button from '@/components/ui/Button.vue'
 import { useDataStore } from '@/store/dataStore'
+import { usePeerStore } from '@/store/peerStore'
 import { useToastStore } from '@/store/toastStore'
 
 const shareBaseUrl =
@@ -17,7 +18,9 @@ const { clientId } = toRefs(props)
 defineEmits<(a: 'saveFile', b: string) => void>()
 
 const dataStore = useDataStore()
+const peerStore = usePeerStore()
 const toastStore = useToastStore()
+const connectionRoute = computed(() => peerStore.connectionRoute)
 const incomingFiles = computed(() => dataStore.filesToReceive)
 const showUrl = ref(false)
 const copied = ref(false)
@@ -91,9 +94,26 @@ const getIntegrityStatus = (file: { verified?: boolean | null }) => {
 
   <div class="flex flex-col gap-5">
     <!-- Instructions -->
-    <p class="text-[0.625rem] text-muted-foreground/50">
-      // share this code or link with the sender
-    </p>
+    <div class="flex items-center justify-between">
+      <p class="text-[0.625rem] text-muted-foreground/50">
+        // share this code or link with the sender
+      </p>
+      <span
+        v-if="connectionRoute"
+        class="relative inline-flex items-center gap-1 text-[0.625rem] uppercase tracking-widest group"
+        :class="connectionRoute === 'direct'
+          ? 'text-neon-green'
+          : 'text-neon-amber'"
+      >
+        {{ connectionRoute === 'direct' ? '[DIRECT]' : '[RELAYED]' }}
+        <span class="opacity-50 group-hover:opacity-100 transition-opacity cursor-help">[i]</span>
+        <span class="route-tooltip">
+          {{ connectionRoute === 'direct'
+            ? 'Data flows directly between you and the peer — no servers involved'
+            : 'A TURN relay server is forwarding your encrypted data — slower but still end-to-end encrypted' }}
+        </span>
+      </span>
+    </div>
 
     <!-- Toggle label + switch -->
     <div class="flex items-center justify-between">

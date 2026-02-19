@@ -18,6 +18,7 @@ export const usePeerStore = defineStore('peer', () => {
   const connectionStatus = ref<ConnectionStatus>('disconnected')
   const connectionError = ref<string | null>(null)
   const dataChannelStatus = ref<'closed' | 'open'>('closed')
+  const connectionRoute = ref<'direct' | 'relay' | null>(null)
 
   const pc = computed(() => peerConnection.value)
   const remoteId = computed(() => foreignId.value)
@@ -55,12 +56,17 @@ export const usePeerStore = defineStore('peer', () => {
     dataChannelStatus.value = status
   }
 
+  function setConnectionRoute(route: 'direct' | 'relay') {
+    connectionRoute.value = route
+  }
+
   function resetPeerConnection() {
     peerConnection.value.close()
     peerConnection.value = new RTCPeerConnection(configuration)
     connectionStatus.value = 'disconnected'
     connectionError.value = null
     dataChannelStatus.value = 'closed'
+    connectionRoute.value = null
   }
 
   function isValidPeerId(id: string): boolean {
@@ -80,6 +86,8 @@ export const usePeerStore = defineStore('peer', () => {
     setConnectionError,
     clearError,
     isValidPeerId,
+    connectionRoute,
+    setConnectionRoute,
     dataChannelStatus,
     setDataChannelStatus,
     resetPeerConnection,

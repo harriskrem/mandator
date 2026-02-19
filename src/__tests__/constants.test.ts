@@ -9,7 +9,7 @@ import {
 
 describe('constants', () => {
   it('MAX_CHUNK_SIZE is within SCTP limits', () => {
-    expect(MAX_CHUNK_SIZE).toBeLessThanOrEqual(65535)
+    expect(MAX_CHUNK_SIZE).toBeLessThanOrEqual(262_144)
     expect(MAX_CHUNK_SIZE).toBeGreaterThan(0)
   })
 

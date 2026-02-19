@@ -1,5 +1,5 @@
 /** Maximum chunk size for WebRTC data channel (SCTP limit) */
-export const MAX_CHUNK_SIZE = 26_214
+export const MAX_CHUNK_SIZE = 262_144
 
 /** Expected length of Socket.IO-assigned peer IDs */
 export const PEER_ID_LENGTH = 20

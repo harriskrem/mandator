@@ -17,8 +17,8 @@ export default function sendChunks(
     MAX_CHUNK_SIZE,
   )
 
-  const BUFFERED_AMOUNT_LOW_THRESHOLD = 256 * 1024 // 256 KB
-  const BUFFERED_AMOUNT_HIGH_WATER_MARK = 1024 * 1024 // 1 MB
+  const BUFFERED_AMOUNT_LOW_THRESHOLD = 1024 * 1024 // 1 MB
+  const BUFFERED_AMOUNT_HIGH_WATER_MARK = 8 * 1024 * 1024 // 8 MB
   dataChannel.bufferedAmountLowThreshold = BUFFERED_AMOUNT_LOW_THRESHOLD
 
   const dataStore = useDataStore()
@@ -51,20 +51,19 @@ export default function sendChunks(
     const fileHash = fileHashes[currentIndex]
     if (!fileHash) {
       currentIndex++
-      sendFileAtIndex()
+      await sendFileAtIndex()
       return
     }
     const fileToSend = filesToSend[fileHash]
     if (!fileToSend || fileToSend.sent) {
       currentIndex++
-      sendFileAtIndex()
+      await sendFileAtIndex()
       return
     }
 
     try {
       toastStore.addToast(`Sending ${fileToSend.file.name}`, 'info')
 
-      // Send description without hash (hash computed incrementally during transfer)
       dataChannel.send(JSON.stringify({
         type: 'description',
         id: fileHash,
@@ -74,28 +73,55 @@ export default function sendChunks(
 
       dataStore.setSendFileId(fileHash)
 
-      // Stream the file instead of loading it all into memory
       const hasher = await createSHA256()
       const reader = fileToSend.file.stream().getReader()
-      let buffer = new Uint8Array(0)
-      let sentChunks = 0
-      let streamDone = false
 
-      const fillBuffer = async () => {
-        while (!streamDone && buffer.byteLength < maxMessage) {
+      // Efficient buffer: collect stream chunks, concat only when ready to send
+      let pendingChunks: Uint8Array[] = []
+      let pendingSize = 0
+      let streamDone = false
+      let sentChunks = 0
+
+      const fillBuffer = async (): Promise<Uint8Array> => {
+        while (!streamDone && pendingSize < maxMessage) {
           const { done, value } = await reader.read()
           if (done) {
             streamDone = true
             break
           }
-          const newBuffer = new Uint8Array(buffer.byteLength + value.byteLength)
-          newBuffer.set(buffer, 0)
-          newBuffer.set(value, buffer.byteLength)
-          buffer = newBuffer
+          pendingChunks.push(value)
+          pendingSize += value.byteLength
         }
+
+        if (pendingSize === 0) {
+          return new Uint8Array(0)
+        }
+
+        const chunkSize = Math.min(maxMessage, pendingSize)
+        const result = new Uint8Array(chunkSize)
+        let offset = 0
+
+        while (offset < chunkSize && pendingChunks.length > 0) {
+          const piece = pendingChunks[0]!
+          const needed = chunkSize - offset
+          if (piece.byteLength <= needed) {
+            result.set(piece, offset)
+            offset += piece.byteLength
+            pendingChunks.shift()
+            pendingSize -= piece.byteLength
+          } else {
+            result.set(piece.subarray(0, needed), offset)
+            pendingChunks[0] = piece.subarray(needed)
+            pendingSize -= needed
+            offset += needed
+          }
+        }
+
+        return result
       }
 
-      const sendNextChunk = async () => {
+      // Tight async loop: only yields on backpressure or stream I/O
+      while (true) {
         if (dataChannel.readyState !== 'open') {
           reader.cancel()
           dataStore.setTransferError(
@@ -107,10 +133,9 @@ export default function sendChunks(
           return
         }
 
-        await fillBuffer()
+        const chunk = await fillBuffer()
 
-        if (buffer.byteLength === 0) {
-          // All data sent — include hash in complete message
+        if (chunk.byteLength === 0) {
           const hash = hasher.digest('hex')
           dataChannel.send(JSON.stringify({
             type: 'complete',
@@ -121,31 +146,24 @@ export default function sendChunks(
 
           dataStore.markFileAsSent(fileHash)
           currentIndex++
-          sendFileAtIndex()
+          await sendFileAtIndex()
           return
         }
 
-        // Slice off one chunk
-        const chunkSize = Math.min(maxMessage, buffer.byteLength)
-        const chunk = buffer.slice(0, chunkSize)
-        buffer = buffer.slice(chunkSize)
-
         hasher.update(chunk)
-        dataChannel.send(chunk.buffer)
+        dataChannel.send(chunk.buffer as ArrayBuffer)
         sentChunks++
 
         if (dataChannel.bufferedAmount > BUFFERED_AMOUNT_HIGH_WATER_MARK) {
-          dataChannel.addEventListener(
-            'bufferedamountlow',
-            () => { sendNextChunk() },
-            { once: true },
-          )
-        } else {
-          setTimeout(() => { sendNextChunk() }, 0)
+          await new Promise<void>((resolve) => {
+            dataChannel.addEventListener(
+              'bufferedamountlow',
+              () => resolve(),
+              { once: true },
+            )
+          })
         }
       }
-
-      sendNextChunk()
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Unknown error sending file'
