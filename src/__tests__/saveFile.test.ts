@@ -8,25 +8,25 @@ describe('saveFile', () => {
     setActivePinia(createPinia())
   })
 
-  it('does nothing for non-existent file ID', () => {
+  it('does nothing for non-existent file ID', async () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    saveFile('nonexistent')
+    await saveFile('nonexistent')
     expect(spy).toHaveBeenCalledWith('File with id nonexistent not found')
     spy.mockRestore()
   })
 
-  it('creates download link for complete file', () => {
+  it('creates download link for complete file', async () => {
     const store = useDataStore()
     const data = new Uint8Array([1, 2, 3, 4, 5])
     const chunk = new Blob([data])
 
-    store.setFileDescription({
+    await store.setFileDescription({
       id: 'file-1',
       filename: 'test.bin',
       size: chunk.size,
     })
 
-    store.setReceivedChunks(chunk)
+    await store.setReceivedChunks(chunk)
 
     const createObjectURLSpy = vi
       .spyOn(window.URL, 'createObjectURL')
@@ -42,7 +42,7 @@ describe('saveFile', () => {
       click: clickSpy,
     } as unknown as HTMLAnchorElement)
 
-    saveFile('file-1')
+    await saveFile('file-1')
 
     expect(createObjectURLSpy).toHaveBeenCalled()
     expect(clickSpy).toHaveBeenCalled()
@@ -52,21 +52,21 @@ describe('saveFile', () => {
     revokeObjectURLSpy.mockRestore()
   })
 
-  it('does not trigger download if file is incomplete', () => {
+  it('does not trigger download if file is incomplete', async () => {
     const store = useDataStore()
 
-    store.setFileDescription({
+    await store.setFileDescription({
       id: 'file-1',
       filename: 'test.bin',
       size: 1000,
     })
 
     const smallChunk = new Blob([new Uint8Array([1, 2, 3])])
-    store.setReceivedChunks(smallChunk)
+    await store.setReceivedChunks(smallChunk)
 
     const createObjectURLSpy = vi.spyOn(window.URL, 'createObjectURL')
 
-    saveFile('file-1')
+    await saveFile('file-1')
 
     expect(createObjectURLSpy).not.toHaveBeenCalled()
     createObjectURLSpy.mockRestore()

@@ -8,17 +8,24 @@ export default function receiveChunk(
 ) {
   let currentFileId: string | null = null
 
+  // Serialize async message handling to ensure OPFS writes complete in order
+  let writeQueue = Promise.resolve()
+
   ev.channel.onmessage = (event) => {
+    writeQueue = writeQueue.then(() => handleMessage(event))
+  }
+
+  async function handleMessage(event: MessageEvent) {
     const dataStore = useDataStore()
     const toastStore = useToastStore()
 
     try {
       if (typeof event.data === 'string') {
         const data = JSON.parse(event.data)
-        handleJsonMessage(data, dataStore, toastStore, dataChannel)
+        await handleJsonMessage(data, dataStore, toastStore, dataChannel)
       } else {
         if (currentFileId) {
-          dataStore.setReceivedChunks(event.data)
+          await dataStore.setReceivedChunks(event.data)
           sendProgress(dataStore, dataChannel)
         }
       }
@@ -27,7 +34,7 @@ export default function receiveChunk(
     }
   }
 
-  function handleJsonMessage(
+  async function handleJsonMessage(
     data: Record<string, unknown>,
     dataStore: ReturnType<typeof useDataStore>,
     toastStore: ReturnType<typeof useToastStore>,
@@ -36,7 +43,7 @@ export default function receiveChunk(
     switch (data.type) {
       case 'description': {
         const fileDesc = data as unknown as FileDescription
-        dataStore.setFileDescription(fileDesc)
+        await dataStore.setFileDescription(fileDesc)
         currentFileId = fileDesc.id
         toastStore.addToast(`Receiving ${fileDesc.filename}`, 'info')
         break
@@ -44,6 +51,11 @@ export default function receiveChunk(
       case 'complete': {
         if (currentFileId === data.id) {
           if (!currentFileId) break
+          // Store hash from complete message (streaming protocol)
+          if (data.hash) {
+            dataStore.setFileHash(currentFileId, data.hash as string)
+          }
+          await dataStore.finalizeReceive(currentFileId)
           const receivedFile = dataStore?.filesToReceive[currentFileId]
           if (receivedFile) {
             sendProgressMsg(dc, currentFileId, receivedFile.progress)

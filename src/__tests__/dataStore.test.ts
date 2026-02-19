@@ -17,9 +17,9 @@ describe('dataStore', () => {
   })
 
   describe('setFileDescription', () => {
-    it('adds a file to receive with correct metadata', () => {
+    it('adds a file to receive with correct metadata', async () => {
       const store = useDataStore()
-      store.setFileDescription({
+      await store.setFileDescription({
         id: 'file-1',
         filename: 'test.txt',
         size: 1024,
@@ -36,9 +36,9 @@ describe('dataStore', () => {
       expect(store.recFileId).toBe('file-1')
     })
 
-    it('handles description without hash', () => {
+    it('handles description without hash', async () => {
       const store = useDataStore()
-      store.setFileDescription({
+      await store.setFileDescription({
         id: 'file-1',
         filename: 'test.txt',
         size: 1024,
@@ -49,25 +49,25 @@ describe('dataStore', () => {
   })
 
   describe('setReceivedChunks', () => {
-    it('appends chunks and updates progress', () => {
+    it('appends chunks and updates progress', async () => {
       const store = useDataStore()
-      store.setFileDescription({
+      await store.setFileDescription({
         id: 'file-1',
         filename: 'test.txt',
         size: 200,
       })
 
       const chunk = new Blob(['hello world'])
-      store.setReceivedChunks(chunk)
+      await store.setReceivedChunks(chunk)
 
       expect(store.filesToReceive['file-1'].chunks).toHaveLength(1)
       expect(store.filesToReceive['file-1'].progress).toBeGreaterThan(0)
     })
 
-    it('does nothing without a current file', () => {
+    it('does nothing without a current file', async () => {
       const store = useDataStore()
       const chunk = new Blob(['data'])
-      store.setReceivedChunks(chunk)
+      await store.setReceivedChunks(chunk)
       expect(Object.keys(store.filesToReceive)).toHaveLength(0)
     })
   })
@@ -128,9 +128,9 @@ describe('dataStore', () => {
   })
 
   describe('resetData', () => {
-    it('clears all state', () => {
+    it('clears all state', async () => {
       const store = useDataStore()
-      store.setFileDescription({
+      await store.setFileDescription({
         id: 'file-1',
         filename: 'test.txt',
         size: 1024,
@@ -138,7 +138,7 @@ describe('dataStore', () => {
       store.setFileToSend('file-2', new File(['data'], 'send.txt'))
       store.setTransferError('file-1', 'error')
 
-      store.resetData()
+      await store.resetData()
 
       expect(Object.keys(store.filesToReceive)).toHaveLength(0)
       expect(Object.keys(store.filesToSend)).toHaveLength(0)

@@ -2,8 +2,10 @@ export type ReceiveFile = {
   filename: string
   size: number
   progress: number
-  chunks: Blob[]
   hash?: string
   verified?: boolean | null
-  file?: File
+  /** OPFS writable stream (streaming mode) */
+  writable?: FileSystemWritableFileStream
+  /** In-memory chunk accumulation (fallback when OPFS unavailable) */
+  chunks?: Blob[]
 }

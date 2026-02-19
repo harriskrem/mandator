@@ -1,8 +1,8 @@
+import { createSHA256 } from 'hash-wasm'
 import { MAX_CHUNK_SIZE } from '@/config/constants'
 import { useDataStore } from '@/store/dataStore'
 import { useToastStore } from '@/store/toastStore'
 import type { SendFile } from '@/types/SendFile'
-import { computeFileHash } from '@/utils/computeHash'
 
 export default function sendChunks(
   filesToSend: Record<string, SendFile>,
@@ -63,24 +63,41 @@ export default function sendChunks(
 
     try {
       toastStore.addToast(`Sending ${fileToSend.file.name}`, 'info')
-      const hash = await computeFileHash(fileToSend.file)
 
+      // Send description without hash (hash computed incrementally during transfer)
       dataChannel.send(JSON.stringify({
         type: 'description',
         id: fileHash,
         filename: fileToSend.file.name,
         size: fileToSend.file.size,
-        hash,
       }))
 
       dataStore.setSendFileId(fileHash)
 
-      const fileData = await fileToSend.file.arrayBuffer()
-      const totalChunks = Math.ceil(fileData.byteLength / maxMessage)
-      let offset = 0
+      // Stream the file instead of loading it all into memory
+      const hasher = await createSHA256()
+      const reader = fileToSend.file.stream().getReader()
+      let buffer = new Uint8Array(0)
+      let sentChunks = 0
+      let streamDone = false
 
-      const sendNextChunk = () => {
+      const fillBuffer = async () => {
+        while (!streamDone && buffer.byteLength < maxMessage) {
+          const { done, value } = await reader.read()
+          if (done) {
+            streamDone = true
+            break
+          }
+          const newBuffer = new Uint8Array(buffer.byteLength + value.byteLength)
+          newBuffer.set(buffer, 0)
+          newBuffer.set(value, buffer.byteLength)
+          buffer = newBuffer
+        }
+      }
+
+      const sendNextChunk = async () => {
         if (dataChannel.readyState !== 'open') {
+          reader.cancel()
           dataStore.setTransferError(
             fileHash,
             'Data channel closed during transfer',
@@ -90,11 +107,16 @@ export default function sendChunks(
           return
         }
 
-        if (offset >= fileData.byteLength) {
+        await fillBuffer()
+
+        if (buffer.byteLength === 0) {
+          // All data sent — include hash in complete message
+          const hash = hasher.digest('hex')
           dataChannel.send(JSON.stringify({
             type: 'complete',
             id: fileHash,
-            totalChunks,
+            totalChunks: sentChunks,
+            hash,
           }))
 
           dataStore.markFileAsSent(fileHash)
@@ -103,14 +125,23 @@ export default function sendChunks(
           return
         }
 
-        const chunk = fileData.slice(offset, offset + maxMessage)
-        dataChannel.send(chunk)
-        offset += maxMessage
+        // Slice off one chunk
+        const chunkSize = Math.min(maxMessage, buffer.byteLength)
+        const chunk = buffer.slice(0, chunkSize)
+        buffer = buffer.slice(chunkSize)
+
+        hasher.update(chunk)
+        dataChannel.send(chunk.buffer)
+        sentChunks++
 
         if (dataChannel.bufferedAmount > BUFFERED_AMOUNT_HIGH_WATER_MARK) {
-          dataChannel.addEventListener('bufferedamountlow', () => sendNextChunk(), { once: true })
+          dataChannel.addEventListener(
+            'bufferedamountlow',
+            () => { sendNextChunk() },
+            { once: true },
+          )
         } else {
-          setTimeout(sendNextChunk, 0)
+          setTimeout(() => { sendNextChunk() }, 0)
         }
       }
 

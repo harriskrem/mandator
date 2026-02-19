@@ -1,6 +1,7 @@
 import { useDataStore } from '@/store/dataStore'
+import { getTransferFile, isOpfsSupported } from '@/utils/opfsStorage'
 
-export default function saveFile(fileId: string) {
+export default async function saveFile(fileId: string) {
   const dataStore = useDataStore()
   const incomingFiles = dataStore.filesToReceive
   const fileToSave = incomingFiles[fileId]
@@ -10,7 +11,16 @@ export default function saveFile(fileId: string) {
     return
   }
 
-  const blob = new Blob(fileToSave.chunks)
+  let blob: Blob
+
+  if (isOpfsSupported()) {
+    blob = await getTransferFile(fileId)
+  } else if (fileToSave.chunks) {
+    blob = new Blob(fileToSave.chunks)
+  } else {
+    console.error(`No data available for file ${fileId}`)
+    return
+  }
 
   if (blob.size === fileToSave.size) {
     const fileURL = window.URL.createObjectURL(blob)

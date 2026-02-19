@@ -1,14 +1,25 @@
+import { createSHA256 } from 'hash-wasm'
+
 export async function computeFileHash(file: File): Promise<string> {
-  const buffer = await file.arrayBuffer()
-  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  const hasher = await createSHA256()
+  const reader = file.stream().getReader()
+
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    hasher.update(value)
+  }
+
+  return hasher.digest('hex')
 }
 
 export async function computeBlobHash(chunks: Blob[]): Promise<string> {
-  const blob = new Blob(chunks)
-  const buffer = await blob.arrayBuffer()
-  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  const hasher = await createSHA256()
+
+  for (const chunk of chunks) {
+    const buffer = await chunk.arrayBuffer()
+    hasher.update(new Uint8Array(buffer))
+  }
+
+  return hasher.digest('hex')
 }
