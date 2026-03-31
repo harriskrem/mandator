@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "packageManager": "yarn@4.13.0",
   "scripts": {
     "dev": "vite",
     "build": "npm run type-check && npm run build-only",
